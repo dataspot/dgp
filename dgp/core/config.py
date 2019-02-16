@@ -1,6 +1,7 @@
 import os
 import yaml
-
+import json
+import hashlib
 
 class Config():
 
@@ -12,6 +13,7 @@ class Config():
                 self._config = self._flatten(yaml.load(input))
         self._validators = []
         self._dirty = True
+        self._state_keys = set()
         self._save()
 
     def _unflatten(self):
@@ -41,6 +43,7 @@ class Config():
                 yaml.dump(config, out, default_flow_style=False, indent=2, allow_unicode=True, encoding='utf8')
     
     def get(self, key):
+        self._state_keys.add(key)
         return self._config.get(key)
 
     def __getitem__(self, key):
@@ -51,6 +54,7 @@ class Config():
 
     def set(self, key, value):
         self._dirty = key not in self or self.get(key) != value
+        # self._state_keys.add(key)
         self._config[key] = value
         self._save()
 
@@ -66,3 +70,29 @@ class Config():
         ret = self._dirty
         self._dirty = False
         return ret
+
+    def dirty_state(self, state_key):
+        k = self._state_config_key(state_key)
+        if k in self:
+            state = self.get(k)
+            keys = state[0]
+            return self._calc_hash(keys) != state[1]
+        return True
+
+    def reset_state(self, state_key):
+        self._state_keys = set()
+
+    def write_state(self, state_key):
+        state_hash = self._calc_hash(self._state_keys)
+        self.set(self._state_config_key(state_key),
+                 [list(self._state_keys), state_hash])
+
+    def _state_config_key(self, state_key):
+        return '__state.{}'.format(state_key)
+
+    def _calc_hash(self, keys):
+        keys = sorted(keys)
+        md5 = hashlib.md5()
+        for key in keys:
+            md5.update(json.dumps(self.get(key), sort_keys=True).encode('utf8'))
+        return md5.hexdigest()

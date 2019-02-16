@@ -51,10 +51,17 @@ class BaseAnalyzer(BaseDataGenusProcessor):
         if hasattr(self, 'REQUIRES'):
             self.errors.extend(self.REQUIRES.check(self.config))
         return len(self.errors) == 0
-        
+    
     def analyze(self):
         if self.test():
-            self.run()
+            state_key = self.__class__.__name__
+            if self.config.dirty_state(state_key):
+                print('DIRTY', state_key)
+                self.config.reset_state(state_key)
+                self.run()
+                self.config.write_state(state_key)
+            else:
+                print('NOT DIRTY', state_key)
             return True
         return False
 
