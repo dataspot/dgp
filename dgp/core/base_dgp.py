@@ -37,6 +37,9 @@ class BaseDataGenusProcessor:
             return False
         return True
 
+    def preflow(self):
+        return None
+
     def flow(self):
         flows = [step.flow() for step in self.steps]
         return Flow(*list(filter(lambda x: x is not None, flows)))

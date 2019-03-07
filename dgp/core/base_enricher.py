@@ -75,10 +75,12 @@ class DatapackageJoiner(BaseEnricher):
         self.ref_hash = md5(self.REF_DATAPACKAGE.encode('utf8')).hexdigest()
         self.key = self.__class__.__name__
 
-        Flow(load(self.REF_DATAPACKAGE),
-             rename_last_resource(self.ref_hash),
-             dump_to_path('.enrichments/{}'.format(self.ref_hash)),
-             checkpoint(self.ref_hash)).process()
+        chkpt = checkpoint(self.ref_hash)
+        if not chkpt.exists():
+            Flow(load(self.REF_DATAPACKAGE),
+                rename_last_resource(self.ref_hash),
+                dump_to_path('.enrichments/{}'.format(self.ref_hash)),
+                chkpt).process()
         print('DONE PREPARING', self.key)
 
     def preflow(self):
@@ -125,27 +127,21 @@ class DatapackageJoiner(BaseEnricher):
         return f
 
 
-def enrichments_flow(config: Config, context: Context, *classes):
+def enrichments_flows(config: Config, context: Context, *classes):
     active_enrichments = [e(config) for e in classes]
     active_enrichments = [e for e in active_enrichments if e.test()]
 
-    steps = []
+    presteps = []
+    poststeps = []
 
     for e in active_enrichments:
         f = e.preflow()
         if f:
-            steps.append(f)
-
-    steps.extend([
-        load(context.enricher_dir),
-    ])
+            presteps.append(f)
 
     for e in active_enrichments:
         f = e.postflow()
         if f:
-            steps.append(f)
+            poststeps.append(f)
 
-    f = Flow(
-        *steps
-    )
-    return f
+    return Flow(*presteps), Flow(*poststeps)

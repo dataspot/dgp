@@ -6,12 +6,17 @@ from ..consts import CONFIG_URL
 
 class EnricherDGP(BaseDataGenusProcessor):
 
+    def init(self):
+        self._flows = None
+
+    @property
+    def flows(self):
+        if self._flows is None:
+            self._flows = self.context.taxonomy.flows(self.config, self.context)
+        return self._flows
+
     def preflow(self):
+        return self.flows[0]
 
     def flow(self):
-        config_hash = self.config._calc_hash(CONFIG_URL)
-        enricher_dir = '.enrichments/{}'.format(config_hash)
-        self.context.enricher_dir = '{}/datapackage.json'.format(enricher_dir)
-        return Flow(
-            dump_to_path(enricher_dir),
-        )
+        return self.flows[1]

@@ -18,7 +18,7 @@ def load_module(pyfile):
 
 
 class Taxonomy():
-    
+
     def __init__(self, id, title, column_types, header_mapping,
                        processing_module):
         self.id = id
@@ -27,10 +27,10 @@ class Taxonomy():
         self.header_mapping = header_mapping
         self.processing_module = processing_module
 
-    def flow(self, config, context):
+    def flows(self, config, context):
         if self.processing_module:
-            if hasattr(self.processing_module, 'flow'):
-                return self.processing_module.flow(config, context)
+            if hasattr(self.processing_module, 'flows'):
+                return self.processing_module.flows(config, context)
 
 
 class TaxonomyRegistry():
