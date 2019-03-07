@@ -1,15 +1,36 @@
 import os
+from importlib.util import spec_from_file_location, module_from_spec
 
 import json
 import yaml
 
+
+def load_module(pyfile):
+    processing_module = None
+    try:
+        spec = spec_from_file_location('{}_processing'.format(id), pyfile.name)
+        if spec is not None:
+            processing_module = module_from_spec(spec)
+            spec.loader.exec_module(processing_module)
+    except FileNotFoundError:
+        pass
+    return processing_module
+
+
 class Taxonomy():
     
-    def __init__(self, id, title, column_types, header_mapping):
+    def __init__(self, id, title, column_types, header_mapping,
+                       processing_module):
         self.id = id
         self.title = title
         self.column_types = column_types
         self.header_mapping = header_mapping
+        self.processing_module = processing_module
+
+    def flow(self, config, context):
+        if self.processing_module:
+            if hasattr(self.processing_module, 'flow'):
+                return self.processing_module.flow(config, context)
 
 
 class TaxonomyRegistry():
@@ -38,6 +59,7 @@ class TaxonomyRegistry():
             for (key, loader) in [
                     ('column_types', json.load), 
                     ('header_mapping', yaml.load),
+                    ('processing_module', load_module),
                     ]:
                 value = v.get(key)
                 if value is not None:

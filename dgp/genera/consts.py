@@ -1,3 +1,5 @@
+RESOURCE_NAME        = 'out'
+
 CONFIG_URL           = 'source.path'
 CONFIG_FORMAT        = 'source.format'
 CONFIG_FORMAT_       = (CONFIG_FORMAT, 'File Format')

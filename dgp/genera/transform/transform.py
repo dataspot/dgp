@@ -1,9 +1,10 @@
-from dataflows import Flow, concatenate, printer, add_computed_field, \
-    unpivot, validate, dump_to_path, PackageWrapper
+from dataflows import Flow, concatenate, add_computed_field, \
+    unpivot, PackageWrapper
 
-from ...core import BaseDataGenusProcessor, Required, Validator
+from ...core import BaseDataGenusProcessor
 from .analyzers import TaxonomiesDGP, MappingDGP
-from ..consts import *
+from ..consts import CONFIG_MODEL_EXTRA_FIELDS, CONFIG_MODEL_MAPPING,\
+            CONFIG_TAXONOMY_CT, CONFIG_CONSTANTS, RESOURCE_NAME
 
 
 class TransformDGP(BaseDataGenusProcessor):
@@ -32,7 +33,7 @@ class TransformDGP(BaseDataGenusProcessor):
 
     def copy_names_to_titles(self):
         def func(package: PackageWrapper):
-            for field in package.pkg.descriptor['resources'][0]['schema']['fields']:
+            for field in package.pkg.descriptor['resources'][-1]['schema']['fields']:
                 field['title'] = field['name']
             yield package.pkg
             yield from package
@@ -54,7 +55,7 @@ class TransformDGP(BaseDataGenusProcessor):
                         with_=v
                     )
                     for k, v in self.config.get(CONFIG_CONSTANTS)
-                ]),
+                ], resources=RESOURCE_NAME),
             ] + ([
                 unpivot(
                     [
@@ -64,18 +65,21 @@ class TransformDGP(BaseDataGenusProcessor):
                         )
                         for f in self.config.get(CONFIG_MODEL_MAPPING)
                         if 'normalize' in f
-                    ], extraFieldDefs, normalizeFieldDef
+                    ], extraFieldDefs, normalizeFieldDef,
+                    resources=RESOURCE_NAME
                 ),
             ] if normalizeFieldDef else []) + [
                 self.copy_names_to_titles(),
-                concatenate(dict(
-                    (f['columnType'].replace(':', '-'), [f['name']])
-                    for f in self.config.get(CONFIG_MODEL_MAPPING)
-                    if f.get('columnType') is not None
-                ), dict(
-                    name='out',
-                    path='out.csv'
-                )),
+                concatenate(
+                    dict(
+                        (f['columnType'].replace(':', '-'), [f['name']])
+                        for f in self.config.get(CONFIG_MODEL_MAPPING)
+                        if f.get('columnType') is not None
+                    ), dict(
+                        name=RESOURCE_NAME,
+                        path='out.csv'
+                    ), resources=RESOURCE_NAME
+                ),
                 # printer()
             ]
             f = Flow(

@@ -18,44 +18,45 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
     def get_mapping(self, fields, known, existing, extraFields):
         mapping = []
         for field in fields:
-            if field in existing:
-                mapping.append(existing[field])
-            else:
-                for kf, kv in known.items():
-                    if field.lower() == kf.lower():
-                        ct = kv.get('type')
-                        normalize = kv.get('normalize')
-                        if normalize is not None:
-                            normalizeTarget, normalize = normalize.get('header'), normalize.get('using')
-                        else:
-                            normalizeTarget = None
-                        if ct is None:
-                            field_mapping = dict(
-                                name=field,
-                                title=field,
-                                normalize=normalize,
-                                normalizeTarget=normalizeTarget
-                            )
-                            extraFields.update(
-                                ('extra', k)
-                                for k in normalize.keys()
-                            )
-                            extraFields.add(('normalize', normalizeTarget))
-                        else:
-                            field_mapping = dict(
-                                name=field,
-                                title=field,
-                                columnType=ct
-                            )
-                        mapping.append(field_mapping)
-                        break
+            if field is not None:
+                if field in existing:
+                    mapping.append(existing[field])
                 else:
-                    field_mapping = dict(
-                        name=field,
-                        title=field,
-                        columnType=None
-                    )
-                    mapping.append(field_mapping)
+                    for kf, kv in known.items():
+                        if field.lower() == kf.lower():
+                            ct = kv.get('type')
+                            normalize = kv.get('normalize')
+                            if normalize is not None:
+                                normalizeTarget, normalize = normalize.get('header'), normalize.get('using')
+                            else:
+                                normalizeTarget = None
+                            if ct is None:
+                                field_mapping = dict(
+                                    name=field,
+                                    title=field,
+                                    normalize=normalize,
+                                    normalizeTarget=normalizeTarget
+                                )
+                                extraFields.update(
+                                    ('extra', k)
+                                    for k in normalize.keys()
+                                )
+                                extraFields.add(('normalize', normalizeTarget))
+                            else:
+                                field_mapping = dict(
+                                    name=field,
+                                    title=field,
+                                    columnType=ct
+                                )
+                            mapping.append(field_mapping)
+                            break
+                    else:
+                        field_mapping = dict(
+                            name=field,
+                            title=field,
+                            columnType=None
+                        )
+                        mapping.append(field_mapping)
 
         return mapping
 

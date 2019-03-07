@@ -3,13 +3,13 @@ import tabulator
 import logging
 
 from .config import Config
-from ..genera.consts import CONFIG_SKIP_ROWS
-from ..taxonomies import TaxonomyRegistry
+from ..genera.consts import CONFIG_SKIP_ROWS, CONFIG_TAXONOMY_ID
+from ..taxonomies import TaxonomyRegistry, Taxonomy
 
 
 def trimmer(extended_rows):
     for row_number, headers, row in extended_rows:
-        if headers is not None:
+        if headers:
             row = row[:len(headers)]
             if len(row) < len(headers):
                 continue
@@ -22,12 +22,13 @@ class Context():
         self.config = config
         self.taxonomies: TaxonomyRegistry = taxonomies
         self._stream = None
+        self.enricher_dir = None
 
     def _structure_params(self):
         skip_rows = self.config.get(CONFIG_SKIP_ROWS) if CONFIG_SKIP_ROWS in self.config else None
         return dict(
             headers=skip_rows + 1 if skip_rows is not None else None,
-            ignore_blank_headers=(skip_rows or 0) > 0,  # Temporary hack as tabulator is kind of limited here
+            ignore_blank_headers=True, #(skip_rows or 0) > 0,  # Temporary hack as tabulator is kind of limited here
             post_parse=[trimmer]
         )
 
@@ -45,3 +46,8 @@ class Context():
                 logging.exception('Failed to open URL')
                 raise
         return self._stream
+
+    @property
+    def taxonomy(self) -> Taxonomy:
+        if CONFIG_TAXONOMY_ID in self.config:
+            return self.taxonomies.get(self.config[CONFIG_TAXONOMY_ID])

@@ -1,9 +1,9 @@
-from dataflows import Flow, load, printer, checkpoint, \
-    dump_to_path, stream, PackageWrapper
+from dataflows import Flow, load, PackageWrapper
 
 from ...core import BaseDataGenusProcessor, Required, Validator
 from .analyzers import FileFormatDGP, StructureDGP
-from ..consts import *
+from ..consts import CONFIG_URL, CONFIG_MODEL_EXTRA_FIELDS, CONFIG_TAXONOMY_CT,\
+    CONFIG_MODEL_MAPPING, CONFIG_TAXONOMY_ID, RESOURCE_NAME
 
 
 class LoaderDGP(BaseDataGenusProcessor):
@@ -11,7 +11,7 @@ class LoaderDGP(BaseDataGenusProcessor):
     PRE_CHECKS = Validator(
         Required(CONFIG_URL, 'Source data URL or path')
     )
-    
+
     def init(self):
         self.steps = self.init_classes([
             FileFormatDGP,
@@ -26,7 +26,7 @@ class LoaderDGP(BaseDataGenusProcessor):
             columnTypes = self.config[CONFIG_TAXONOMY_CT]
             descriptor['columnTypes'] = columnTypes
 
-            resource = descriptor['resources'][0]
+            resource = descriptor['resources'][-1]
             resource['path'] = 'out.csv'
             resource['format'] = 'csv'
             resource['mediatype'] = 'text/csv'
@@ -41,7 +41,7 @@ class LoaderDGP(BaseDataGenusProcessor):
             if self.config[CONFIG_MODEL_EXTRA_FIELDS]:
                 for kind, field, *value in self.config[CONFIG_MODEL_EXTRA_FIELDS]:
                     for entry in self.config[CONFIG_MODEL_MAPPING]:
-                        if entry['name'] == field: 
+                        if entry['name'] == field:
                             if kind == 'constant':
                                 entry['constant'] = value[0]
                             elif kind == 'normalize':
@@ -70,7 +70,7 @@ class LoaderDGP(BaseDataGenusProcessor):
             # Our own additions
             descriptor['taxonomyId'] = self.config[CONFIG_TAXONOMY_ID]
 
-            yield package.pkg        
+            yield package.pkg
             yield from package
 
         return func
@@ -80,9 +80,8 @@ class LoaderDGP(BaseDataGenusProcessor):
             structure_params = self.context._structure_params()
             source = self.config._unflatten()['source']
             return Flow(
-                load(source.pop('path'), validate=False, **source, **structure_params),
+                load(source.pop('path'), validate=False, name=RESOURCE_NAME, 
+                     **source, **structure_params),
                 # printer(),
                 self.create_fdp(),
             )
-
-        

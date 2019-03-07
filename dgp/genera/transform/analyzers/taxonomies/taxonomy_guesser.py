@@ -12,17 +12,18 @@ class TaxonomyGuesserAnalyzer(BaseAnalyzer):
     )
 
     def run(self):
-        fields = self.config[CONFIG_HEADER_FIELDS]
-        c = Counter()
-        taxonomies = self.context.taxonomies
-        for field in fields:
-            taxonomy: Taxonomy
-            for taxonomy in taxonomies:
-                for tf in taxonomy.header_mapping.keys():
-                    if tf == field:
-                        c[taxonomy.id] += 1
-        selected = c.most_common(1)
-        if len(selected) > 0:
-            selected = selected[0][0]
-            self.config[CONFIG_TAXONOMY_ID] = selected
-            
+        if self.config[CONFIG_TAXONOMY_ID] is None:
+            fields = self.config[CONFIG_HEADER_FIELDS]
+            c = Counter()
+            taxonomies = self.context.taxonomies
+            for field in fields:
+                taxonomy: Taxonomy
+                for taxonomy in taxonomies:
+                    for tf in taxonomy.header_mapping.keys():
+                        if tf == field:
+                            c[taxonomy.id] += 1
+            selected = c.most_common(1)
+            if len(selected) > 0:
+                selected = selected[0][0]
+                self.config[CONFIG_TAXONOMY_ID] = selected
+        
