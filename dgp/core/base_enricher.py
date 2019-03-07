@@ -35,7 +35,7 @@ class ColumnTypeTester(BaseEnricher):
 
     def test(self):
         all_cts = [
-            x['columnType'] 
+            x['columnType']
             for x in self.config.get(CONFIG_MODEL_MAPPING)
             if 'columnType' in x
         ]
@@ -75,12 +75,12 @@ class DatapackageJoiner(BaseEnricher):
         self.ref_hash = md5(self.REF_DATAPACKAGE.encode('utf8')).hexdigest()
         self.key = self.__class__.__name__
 
-        chkpt = checkpoint(self.ref_hash)
-        if not chkpt.exists():
+        check = checkpoint(self.ref_hash)
+        if not check.exists():
             Flow(load(self.REF_DATAPACKAGE),
-                rename_last_resource(self.ref_hash),
-                dump_to_path('.enrichments/{}'.format(self.ref_hash)),
-                chkpt).process()
+                 rename_last_resource(self.ref_hash),
+                 dump_to_path('.enrichments/{}'.format(self.ref_hash)),
+                 check).process()
         print('DONE PREPARING', self.key)
 
     def preflow(self):
@@ -101,14 +101,17 @@ class DatapackageJoiner(BaseEnricher):
         return f
 
     def postflow(self):
-        target_field_names = [ct.replace(':', '-') for ct in self.TARGET_FIELD_COLUMNTYPES]
+        target_field_names = [
+            ct.replace(':', '-')
+            for ct in self.TARGET_FIELD_COLUMNTYPES
+        ]
         steps = [
             join(
                 self.key, self.REF_KEY_FIELDS,
                 RESOURCE_NAME, self.SOURCE_KEY_FIELDS,
                 dict(
                     (
-                        target_field_name, 
+                        target_field_name,
                         dict(name=fetch_field)
                     )
                     for target_field_name, fetch_field
