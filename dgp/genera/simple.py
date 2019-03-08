@@ -11,7 +11,8 @@ class SimpleDGP(BaseDataGenusProcessor):
     def init(self,
              post_load_flow=None,
              post_transform_flow=None,
-             post_enrich_flow=None):
+             post_enrich_flow=None,
+             publish_flow=None):
 
         self.steps = self.init_classes([
             LoaderDGP,
@@ -23,6 +24,7 @@ class SimpleDGP(BaseDataGenusProcessor):
             post_transform_flow,
             post_enrich_flow,
         ]
+        self.publish_flow = publish_flow
 
     def flow(self):
         flows = []
@@ -38,5 +40,7 @@ class SimpleDGP(BaseDataGenusProcessor):
                 if flow:
                     flows.append(flow)
             else:
-                break
+                return Flow(*flows)
+        if self.publish_flow:
+            flows.append(self.publish_flow)
         return Flow(*flows)

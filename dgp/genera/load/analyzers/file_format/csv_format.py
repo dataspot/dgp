@@ -1,5 +1,5 @@
 from .....core import BaseAnalyzer, Validator, Required
-from ....consts import *
+from ....consts import CONFIG_FORMAT, CONFIG_FORMAT_, CONFIG_ENCODING
 
 
 class CSVFormatAnalyzer(BaseAnalyzer):
@@ -12,4 +12,3 @@ class CSVFormatAnalyzer(BaseAnalyzer):
         if self.config[CONFIG_FORMAT] == 'csv':
             stream = self.context.stream
             self.config[CONFIG_ENCODING] = stream.encoding
-

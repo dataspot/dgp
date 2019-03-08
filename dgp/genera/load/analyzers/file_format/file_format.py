@@ -1,5 +1,5 @@
 from .....core import BaseAnalyzer
-from ....consts import *
+from ....consts import CONFIG_FORMAT
 
 
 class FileFormatAnalyzer(BaseAnalyzer):

@@ -5,10 +5,10 @@ import json
 import yaml
 
 
-def load_module(pyfile):
+def load_module(py_file):
     processing_module = None
     try:
-        spec = spec_from_file_location('{}_processing'.format(id), pyfile.name)
+        spec = spec_from_file_location('{}_processing'.format(id), py_file.name)
         if spec is not None:
             processing_module = module_from_spec(spec)
             spec.loader.exec_module(processing_module)
@@ -20,7 +20,7 @@ def load_module(pyfile):
 class Taxonomy():
 
     def __init__(self, id, title, column_types, header_mapping,
-                       processing_module):
+                 processing_module):
         self.id = id
         self.title = title
         self.column_types = column_types
@@ -40,7 +40,7 @@ class TaxonomyRegistry():
 
     def get(self, id) -> Taxonomy:
         return self.index[id]
-    
+
     def all_ids(self):
         return sorted(self.index.keys())
 
@@ -57,19 +57,18 @@ class TaxonomyRegistry():
 
             args = [v['title']]
             for (key, loader) in [
-                    ('column_types', json.load), 
+                    ('column_types', json.load),
                     ('header_mapping', yaml.load),
                     ('processing_module', load_module),
                     ]:
                 value = v.get(key)
                 if value is not None:
                     if isinstance(value, str):
-                        with open(os.path.join(base_path, value)) as infile:
-                            value = loader(infile)
+                        with open(os.path.join(base_path, value)) as in_file:
+                            value = loader(in_file)
                 else:
                     value = {}
                 args.append(value)
 
             ret[id] = Taxonomy(id, *args)
         return ret
-            

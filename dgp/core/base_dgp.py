@@ -19,7 +19,7 @@ class BaseDataGenusProcessor:
         pass
 
     def test(self):
-        return True
+        return len(self.errors) == 0
 
     def init_classes(self, classes):
         return [
@@ -46,7 +46,7 @@ class BaseDataGenusProcessor:
 
 
 class BaseAnalyzer(BaseDataGenusProcessor):
-    
+
     def run(self):
         raise NotImplementedError()
 
@@ -54,7 +54,7 @@ class BaseAnalyzer(BaseDataGenusProcessor):
         if hasattr(self, 'REQUIRES'):
             self.errors.extend(self.REQUIRES.check(self.config))
         return len(self.errors) == 0
-    
+
     def analyze(self):
         if self.test():
             state_key = self.__class__.__name__
@@ -73,7 +73,7 @@ class BaseAnalyzer(BaseDataGenusProcessor):
 
 
 class BaseProcessor(BaseDataGenusProcessor):
-    
+
     def run(self):
         raise NotImplementedError()
 

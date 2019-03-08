@@ -2,7 +2,7 @@ from collections import Counter
 
 from .....core import BaseAnalyzer, Validator, Required
 from .....taxonomies import Taxonomy
-from ....consts import *
+from ....consts import CONFIG_HEADER_FIELDS, CONFIG_TAXONOMY_ID
 
 
 class TaxonomyGuesserAnalyzer(BaseAnalyzer):
@@ -26,4 +26,3 @@ class TaxonomyGuesserAnalyzer(BaseAnalyzer):
             if len(selected) > 0:
                 selected = selected[0][0]
                 self.config[CONFIG_TAXONOMY_ID] = selected
-        

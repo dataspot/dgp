@@ -1,8 +1,6 @@
-from collections import Counter
-
 from .....core import BaseAnalyzer, Validator, Required
-from .....taxonomies import Taxonomy
-from ....consts import *
+from ....consts import CONFIG_HEADER_FIELDS, CONFIG_TAXONOMY_ID, CONFIG_MODEL_EXTRA_FIELDS, \
+        CONFIG_TAXONOMY_CT, CONFIG_CONSTANTS, CONFIG_MODEL_MAPPING
 
 
 class MappingGuesserAnalyzer(BaseAnalyzer):
@@ -62,7 +60,7 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
 
     def run(self):
         fields = self.config[CONFIG_HEADER_FIELDS]
-        types = self.config[CONFIG_TAXONOMY_CT]
+        # types = self.config[CONFIG_TAXONOMY_CT]
         taxonomy_id = self.config[CONFIG_TAXONOMY_ID]
         constants = dict(self.config[CONFIG_CONSTANTS])
         current_mapping = self.config[CONFIG_MODEL_MAPPING]
@@ -70,7 +68,7 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
         known = self.context.taxonomies.get(taxonomy_id).header_mapping
         # [
         #     (kf, ct, normalize)
-        #     for kf, txn_id, ct, *normalize in known_fields() 
+        #     for kf, txn_id, ct, *normalize in known_fields()
         #     if txn_id in (None, taxonomy_id)
         # ]
         existing = dict(
@@ -94,9 +92,9 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
             for f in current_mapping
             if 'normalizeTarget' in f
         ))
-        
+
         mapping = []
-        mapping.extend(self.get_mapping(fields, known, existing, extraFields))   
+        mapping.extend(self.get_mapping(fields, known, existing, extraFields))
         extraFields = list(map(list, sorted(extraFields)))
         extraFieldsMapping = self.get_mapping([x[1] for x in extraFields],
                                               known, existing, None)

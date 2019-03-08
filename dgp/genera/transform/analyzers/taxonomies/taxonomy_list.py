@@ -1,5 +1,5 @@
 from .....core import BaseAnalyzer
-from ....consts import *
+from ....consts import CONFIG_TAXONOMY_LIST
 
 
 class TaxonomyListAnalyzer(BaseAnalyzer):

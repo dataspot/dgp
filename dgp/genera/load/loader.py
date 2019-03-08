@@ -80,7 +80,7 @@ class LoaderDGP(BaseDataGenusProcessor):
             structure_params = self.context._structure_params()
             source = self.config._unflatten()['source']
             return Flow(
-                load(source.pop('path'), validate=False, name=RESOURCE_NAME, 
+                load(source.pop('path'), validate=False, name=RESOURCE_NAME,
                      **source, **structure_params),
                 # printer(),
                 self.create_fdp(),

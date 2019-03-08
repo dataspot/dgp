@@ -1,11 +1,11 @@
 from .....core import BaseAnalyzer, Validator, Required
-from ....consts import *
+from ....consts import CONFIG_SKIP_ROWS, CONFIG_SKIP_COLS, CONFIG_HEADER_FIELDS
 
 
 class HeaderFieldsAnalyzer(BaseAnalyzer):
 
     REQUIRES = Validator(
-        Required(CONFIG_SKIP_ROWS), 
+        Required(CONFIG_SKIP_ROWS),
         Required(CONFIG_SKIP_COLS),
     )
 

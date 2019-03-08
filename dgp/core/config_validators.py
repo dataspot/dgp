@@ -28,7 +28,7 @@ class ConfigValidationError():
 
     def __str__(self):
         if self.code == BaseValidator.MISSING:
-            return 'Missing configuration: {}'.format(self.options.get('description') or self.key)
+            return 'Missing configuration: {} ({})'.format(self.options.get('description') or self.key, self.key)
         elif self.code == BaseValidator.INVALID:
             return 'Invalid configuration: {}'.format(self.options.get('description') or self.key)
 
@@ -41,7 +41,7 @@ class Required(BaseValidator):
     def __init__(self, key, description=None):
         self.key = key
         self.description = description
-    
+
     def check(self, config):
         if self.key in config:
             return []

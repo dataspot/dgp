@@ -3,6 +3,7 @@ from .file_format import FileFormatAnalyzer
 from .csv_format import CSVFormatAnalyzer
 from .xls_format import XLSFormatAnalyzer
 
+
 class FileFormatDGP(BaseDataGenusProcessor):
 
     def init(self):
@@ -11,5 +12,3 @@ class FileFormatDGP(BaseDataGenusProcessor):
             CSVFormatAnalyzer,
             XLSFormatAnalyzer
         ])
-
-

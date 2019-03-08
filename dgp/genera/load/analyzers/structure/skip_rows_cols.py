@@ -1,5 +1,5 @@
 from .....core import BaseAnalyzer
-from ....consts import *
+from ....consts import CONFIG_SKIP_ROWS, CONFIG_SKIP_COLS, CONFIG_HEADER_COUNT
 
 
 class SkipRowsColsAnalyzer(BaseAnalyzer):
@@ -18,13 +18,17 @@ class SkipRowsColsAnalyzer(BaseAnalyzer):
             except IndexError:
                 return False
 
+        def top(_idx):
+            return has_value(skip_row, skip_col + _idx)
+
+        def bottom(_idx):
+            return has_value(skip_row + 1, skip_col + _idx)
+
         for skip_row in range(10):
             for skip_col in range(5):
                 idx = 0
                 score = 0
                 headers = 0
-                top = lambda _idx: has_value(skip_row, skip_col + _idx) 
-                bottom = lambda _idx: has_value(skip_row + 1, skip_col + _idx)
                 while top(idx) or bottom(idx):
                     score += 1 if top(idx) and bottom(idx) else 0
                     headers += 1 if top(idx) else 0

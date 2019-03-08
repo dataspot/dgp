@@ -12,5 +12,3 @@ class TaxonomiesDGP(BaseDataGenusProcessor):
             TaxonomyGuesserAnalyzer,
             TaxonomyFetcherAnalyzer,
         ])
-
-

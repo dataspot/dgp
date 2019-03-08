@@ -3,13 +3,14 @@ import yaml
 import json
 import hashlib
 
+
 class Config():
 
     def __init__(self, filename=None):
         self.filename = filename
         self._config = {}
         if filename and os.path.exists(filename):
-            with open(filename) as input: 
+            with open(filename) as input:
                 self._config = self._flatten(yaml.load(input))
         self._validators = []
         self._dirty = True
@@ -41,7 +42,7 @@ class Config():
         if self.filename:
             with open(self.filename, 'w') as out:
                 yaml.dump(config, out, default_flow_style=False, indent=2, allow_unicode=True, encoding='utf8')
-    
+
     def get(self, key):
         self._state_keys.add(key)
         return self._config.get(key)

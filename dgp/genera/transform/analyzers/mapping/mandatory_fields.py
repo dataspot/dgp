@@ -1,6 +1,5 @@
 from .....core import BaseAnalyzer, Validator, Required, ConfigValidationError
-from .....taxonomies import Taxonomy
-from ....consts import *
+from ....consts import CONFIG_TAXONOMY_CT, CONFIG_MODEL_MAPPING
 
 
 class MandatoryFieldsAnalyzer(BaseAnalyzer):

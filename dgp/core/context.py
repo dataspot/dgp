@@ -28,7 +28,7 @@ class Context():
         skip_rows = self.config.get(CONFIG_SKIP_ROWS) if CONFIG_SKIP_ROWS in self.config else None
         return dict(
             headers=skip_rows + 1 if skip_rows is not None else None,
-            ignore_blank_headers=True, #(skip_rows or 0) > 0,  # Temporary hack as tabulator is kind of limited here
+            ignore_blank_headers=True,  # (skip_rows or 0) > 0,  # Temporary hack as tabulator is kind of limited here
             post_parse=[trimmer]
         )
 
