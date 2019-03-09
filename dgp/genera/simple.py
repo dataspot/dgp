@@ -28,17 +28,16 @@ class SimpleDGP(BaseDataGenusProcessor):
 
     def flow(self):
         flows = []
-        for step in reversed(self.steps):
-            preflow = step.preflow()
-            if preflow:
-                flows.append(preflow)
-        for i in range(len(self.steps)):
-            flow = self.steps[i].flow()
+        for i, step in enumerate(self.steps):
+            flow = step.flow()
             if flow:
                 flows.append(flow)
                 flow = self.post_flows[i]
                 if flow:
                     flows.append(flow)
+                flow = step.preflow()
+                if flow:
+                    flows.insert(0, flow)
             else:
                 return Flow(*flows)
         if self.publish_flow:

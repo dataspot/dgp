@@ -131,13 +131,13 @@ class DatapackageJoiner(BaseEnricher):
 
 
 def enrichments_flows(config: Config, context: Context, *classes):
-    active_enrichments = [e(config) for e in classes]
-    active_enrichments = [e for e in active_enrichments if e.test()]
+    all_enrichments = [e(config) for e in classes]
+    active_enrichments = [e for e in all_enrichments if e.test()]
 
     presteps = []
     poststeps = []
 
-    for e in active_enrichments:
+    for e in all_enrichments:
         f = e.preflow()
         if f:
             presteps.append(f)
