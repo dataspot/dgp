@@ -42,6 +42,10 @@ class Context():
                 source = copy.deepcopy(self.config._unflatten().get('source', {}))
                 structure = self._structure_params()
                 self._stream = tabulator.Stream(source.pop('path'), **source, **structure).open()
+                for k in source.keys():
+                    self.config.get('source.' + k)
+                for k in structure.keys():
+                    self.config.get('structure.' + k)
             except Exception:
                 logging.exception('Failed to open URL')
                 raise

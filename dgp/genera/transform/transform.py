@@ -1,5 +1,5 @@
 from dataflows import Flow, concatenate, add_computed_field, \
-    unpivot, PackageWrapper
+    unpivot, set_primary_key, PackageWrapper
 
 from ...core import BaseDataGenusProcessor
 from .analyzers import TaxonomiesDGP, MappingDGP
@@ -39,8 +39,25 @@ class TransformDGP(BaseDataGenusProcessor):
             yield from package
         return func
 
+    def unique_column_types(self):
+        columnTypes = self.config.get(CONFIG_TAXONOMY_CT)
+        return set(
+            c['name']
+            for c in columnTypes
+            if c.get('unique')
+        )
+
+    def ct_to_fn(self, ct):
+        return ct.replace(':', '-')
+
     def flow(self):
         if len(self.errors) == 0:
+            uniqueColumnTypes = self.unique_column_types()
+            primaryKey = [
+                self.ct_to_fn(f['columnType'])
+                for f in self.config.get(CONFIG_MODEL_MAPPING)
+                if f.get('columnType') in uniqueColumnTypes
+            ]
             extraFieldDefs = self.join_mapping_taxonomy('extra')
             normalizeFieldDef = self.join_mapping_taxonomy('normalize')
             if len(normalizeFieldDef) > 0:
@@ -72,14 +89,15 @@ class TransformDGP(BaseDataGenusProcessor):
                 self.copy_names_to_titles(),
                 concatenate(
                     dict(
-                        (f['columnType'].replace(':', '-'), [f['name']])
+                        (self.ct_to_fn(f['columnType']), [f['name']])
                         for f in self.config.get(CONFIG_MODEL_MAPPING)
                         if f.get('columnType') is not None
                     ), dict(
                         name=RESOURCE_NAME,
-                        path='out.csv'
+                        path='out.csv',
                     ), resources=RESOURCE_NAME
                 ),
+                set_primary_key(primaryKey, resources=RESOURCE_NAME)
                 # printer()
             ]
             f = Flow(
