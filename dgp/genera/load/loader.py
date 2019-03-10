@@ -1,4 +1,8 @@
-from dataflows import Flow, load, PackageWrapper
+import os
+import json
+from hashlib import md5
+
+from dataflows import Flow, load, PackageWrapper, dump_to_path
 
 from ...core import BaseDataGenusProcessor, Required, Validator
 from .analyzers import FileFormatDGP, StructureDGP
@@ -75,13 +79,33 @@ class LoaderDGP(BaseDataGenusProcessor):
 
         return func
 
+    def hash_key(self, *args):
+        data = json.dumps(args, sort_keys=True, ensure_ascii=False)
+        return md5(data.encode('utf8')).hexdigest()
+
     def flow(self):
         if len(self.errors) == 0:
-            structure_params = self.context._structure_params()
-            source = self.config._unflatten()['source']
-            return Flow(
-                load(source.pop('path'), validate=False, name=RESOURCE_NAME,
-                     **source, **structure_params),
-                # printer(),
-                self.create_fdp(),
-            )
+
+            config = self.config._unflatten()
+            source = config['source']
+            ref_hash = self.hash_key(source, config['structure'])
+            cache_path = os.path.join('.cache', ref_hash)
+            datapackage_path = os.path.join(cache_path, 'datapackage.json')
+
+            if os.path.exists(datapackage_path):
+                print('Using cached source data from {}'.format(cache_path))
+                return Flow(
+                    load(datapackage_path, validate=False,
+                         resources=RESOURCE_NAME),
+                    self.create_fdp(),
+                )
+            else:
+                print('Caching source data into {}'.format(cache_path))
+                structure_params = self.context._structure_params()
+                return Flow(
+                    load(source.pop('path'), validate=False,
+                         name=RESOURCE_NAME,
+                         **source, **structure_params),
+                    dump_to_path(cache_path),
+                    self.create_fdp(),
+                )

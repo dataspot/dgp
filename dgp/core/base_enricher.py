@@ -79,13 +79,13 @@ class DatapackageJoiner(BaseEnricher):
         if not check.exists():
             Flow(load(self.REF_DATAPACKAGE),
                  rename_last_resource(self.ref_hash),
-                 dump_to_path('.enrichments/{}'.format(self.ref_hash)),
+                 dump_to_path('.cache/{}'.format(self.ref_hash)),
                  check).process()
         print('DONE PREPARING', self.key)
 
     def preflow(self):
         f = Flow(
-            load('.enrichments/{}/datapackage.json'.format(self.ref_hash)),
+            load('.cache/{}/datapackage.json'.format(self.ref_hash)),
             concatenate(
                 fields=dict(
                     (f, [])
