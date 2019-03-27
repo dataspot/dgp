@@ -20,12 +20,13 @@ def load_module(py_file):
 class Taxonomy():
 
     def __init__(self, id, title, column_types, header_mapping,
-                 processing_module):
+                 processing_module, config):
         self.id = id
         self.title = title
         self.column_types = column_types
         self.header_mapping = header_mapping
         self.processing_module = processing_module
+        self.config = config
 
     def flows(self, config, context):
         if self.processing_module:
@@ -60,6 +61,7 @@ class TaxonomyRegistry():
                     ('column_types', json.load),
                     ('header_mapping', yaml.load),
                     ('processing_module', load_module),
+                    ('config', None),
                     ]:
                 value = v.get(key)
                 if value is not None:
