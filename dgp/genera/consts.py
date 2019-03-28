@@ -6,6 +6,7 @@ CONFIG_FORMAT_ = (CONFIG_FORMAT, 'File Format')
 CONFIG_ENCODING = 'source.encoding'
 CONFIG_HEADERS = 'source.headers'
 CONFIG_SHEET = 'source.sheet'
+CONFIG_SHEET_NAMES = 'source.sheet_names'
 CONFIG_FORCE_STRINGS = 'source.force_strings'
 
 CONFIG_SKIP_ROWS = 'structure.skip_rows'
