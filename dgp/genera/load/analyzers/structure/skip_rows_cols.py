@@ -5,6 +5,9 @@ from ....consts import CONFIG_SKIP_ROWS, CONFIG_SKIP_COLS, CONFIG_HEADER_COUNT
 class SkipRowsColsAnalyzer(BaseAnalyzer):
 
     def run(self):
+        if CONFIG_SKIP_COLS in self.config or CONFIG_SKIP_ROWS in self.config:
+            return True
+
         self.config[CONFIG_SKIP_ROWS] = 0
         self.config[CONFIG_SKIP_COLS] = 0
         stream = self.context.stream
