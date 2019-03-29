@@ -92,20 +92,19 @@ class LoaderDGP(BaseDataGenusProcessor):
             cache_path = os.path.join('.cache', ref_hash)
             datapackage_path = os.path.join(cache_path, 'datapackage.json')
 
-            if os.path.exists(datapackage_path):
-                print('Using cached source data from {}'.format(cache_path))
-                return Flow(
-                    load(datapackage_path, validate=False,
-                         resources=RESOURCE_NAME),
-                    self.create_fdp(),
-                )
-            else:
+            if not os.path.exists(datapackage_path):
                 print('Caching source data into {}'.format(cache_path))
                 structure_params = self.context._structure_params()
-                return Flow(
+                Flow(
                     load(source.pop('path'), validate=False,
                          name=RESOURCE_NAME,
                          **source, **structure_params),
                     dump_to_path(cache_path),
                     self.create_fdp(),
-                )
+                ).process()
+            print('Using cached source data from {}'.format(cache_path))
+            return Flow(
+                load(datapackage_path, validate=False,
+                     resources=RESOURCE_NAME),
+                self.create_fdp(),
+            )
