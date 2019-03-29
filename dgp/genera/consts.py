@@ -22,3 +22,5 @@ CONFIG_CONSTANTS = 'constants'
 
 CONFIG_MODEL_MAPPING = 'model.mapping'
 CONFIG_MODEL_EXTRA_FIELDS = 'model.extraFields'
+
+CONFIG_PUBLISH_ALLOWED = 'publish.allowed'
