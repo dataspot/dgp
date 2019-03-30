@@ -1,12 +1,12 @@
 from hashlib import md5
 
-from dataflows import Flow, PackageWrapper
+from dataflows import Flow, PackageWrapper, DataStream
 from dataflows import load, concatenate, join, set_type, checkpoint,\
-                      dump_to_path
+                      dump_to_path, add_computed_field, delete_fields
 
 from .config import Config
 from .context import Context
-from ..genera.consts import CONFIG_MODEL_MAPPING, RESOURCE_NAME
+from ..genera.consts import RESOURCE_NAME
 
 
 class BaseEnricher:
@@ -34,16 +34,66 @@ class ColumnTypeTester(BaseEnricher):
     # PROHIBITED_COLUMN_TYPES = []
 
     def test(self):
-        all_cts = [
-            x['columnType']
-            for x in self.config.get(CONFIG_MODEL_MAPPING)
-            if 'columnType' in x
-        ]
-        if not all(x in all_cts for x in self.REQUIRED_COLUMN_TYPES):
-            return False
-        if any(x in all_cts for x in self.PROHIBITED_COLUMN_TYPES):
-            return False
         return True
+
+    def conditional(self):
+        raise NotImplementedError
+
+    def postflow(self):
+
+        def func(package: PackageWrapper):
+            res = next(filter(lambda res: res.name == RESOURCE_NAME, package.pkg.resources))
+            for x in res.descriptor['schema']['fields']:
+                assert x.get('columnType'), 'Missing CT for %s' % x
+            all_cts = [
+                x['columnType']
+                for x in res.descriptor['schema']['fields']
+            ]
+            process = True
+            if not all(x in all_cts for x in self.REQUIRED_COLUMN_TYPES):
+                process = False
+            if any(x in all_cts for x in self.PROHIBITED_COLUMN_TYPES):
+                process = False
+            if not process:
+                yield package.pkg
+                yield from package
+            else:
+                ds = DataStream(package.pkg, package)
+                ds = self.conditional().datastream(ds)
+                yield ds.dp
+                for res in ds.res_iter:
+                    yield res.it
+        return Flow(func)
+
+
+class ColumnReplacer(ColumnTypeTester):
+
+    def work(self):
+        def func(rows):
+            if rows.res.name == RESOURCE_NAME:
+                for row in rows:
+                    self.operate_on_row(row)
+                    yield row
+            else:
+                yield from rows
+        return func
+
+    def conditional(self):
+        new_fields = [x.replace(':', '-') for x in self.PROHIBITED_COLUMN_TYPES]
+        old_fields = [x.replace(':', '-') for x in self.REQUIRED_COLUMN_TYPES]
+        return Flow(
+            add_computed_field([dict(
+                    target=f,
+                    operation='constant',
+                ) for f in new_fields],
+                resources=RESOURCE_NAME),
+            self.work(),
+            *[
+                set_type(f, columnType=ct)
+                for (f, ct) in zip(new_fields, self.PROHIBITED_COLUMN_TYPES)
+            ],
+            delete_fields(old_fields, resources=RESOURCE_NAME),
+        )
 
 
 def rename_last_resource(name):
@@ -63,7 +113,7 @@ def rename_last_resource(name):
     return func
 
 
-class DatapackageJoiner(BaseEnricher):
+class DatapackageJoiner(ColumnTypeTester):
 
     # REF_DATAPACKAGE = ''
     # REF_KEY_FIELDS = ['']
@@ -100,7 +150,7 @@ class DatapackageJoiner(BaseEnricher):
         )
         return f
 
-    def postflow(self):
+    def conditional(self):
         target_field_names = [
             ct.replace(':', '-')
             for ct in self.TARGET_FIELD_COLUMNTYPES

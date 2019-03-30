@@ -25,6 +25,25 @@ class MandatoryFieldsAnalyzer(BaseAnalyzer):
                 ct = m.get('columnType')
                 if ct in mandatory:
                     del mandatory[ct]
+            
+            to_del = []
+            for ct, m in mandatory.items():
+                alternatives = m.get('alternatives', [])
+                for alternative in alternatives:
+                    print(ct, alternative)
+                    alternative = set(alternative)
+                    for m in mapping:
+                        mct = m.get('columnType')
+                        if mct in alternative:
+                            alternative.remove(mct)
+                        if len(alternative) == 0:
+                            break
+                    print(ct, alternative)
+                    if len(alternative) == 0:
+                        to_del.append(ct)
+                        break
+            for ct in to_del:
+                del mandatory[ct]
 
             mandatory = list(mandatory.values())
 
