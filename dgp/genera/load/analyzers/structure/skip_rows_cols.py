@@ -17,7 +17,7 @@ class SkipRowsColsAnalyzer(BaseAnalyzer):
         def has_value(row, col):
             try:
                 val = sample[row][col]
-                return bool(val)
+                return val == 0 or bool(val)
             except IndexError:
                 return False
 

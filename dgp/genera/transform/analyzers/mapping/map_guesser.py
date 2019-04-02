@@ -13,7 +13,7 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
         Required(CONFIG_MODEL_MAPPING),
     )
 
-    def get_mapping(self, fields, known, existing, extraFields):
+    def get_mapping(self, fields, known, existing, extraFields, cts):
         mapping = []
         for field in fields:
             if field is not None:
@@ -23,6 +23,10 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
                     for kf, kv in known.items():
                         if field.lower() == kf.lower():
                             ct = kv.get('type')
+                            full_ct = cts.get(ct)
+                            if full_ct is None:
+                                print('Failed to find columnType entry for known mapping {} -> {}'.format(kf, kv))
+                                continue
                             normalize = kv.get('normalize')
                             if normalize is not None:
                                 normalizeTarget, normalize = normalize.get('header'), normalize.get('using')
@@ -31,7 +35,7 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
                             if ct is None:
                                 field_mapping = dict(
                                     name=field,
-                                    title=field,
+                                    title=full_ct.get(title, field),
                                     normalize=normalize,
                                     normalizeTarget=normalizeTarget
                                 )
@@ -66,6 +70,14 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
         current_mapping = self.config[CONFIG_MODEL_MAPPING]
 
         known = self.context.taxonomies.get(taxonomy_id).header_mapping
+        cts = self.context.taxonomies.get(taxonomy_id).column_types
+        for ct in cts:
+            if ct['title'] not in known:
+                known[ct['title']] = dict(type=ct['name'])
+        cts = dict(
+            (ct['name'], ct)
+            for ct in cts
+        )
         # [
         #     (kf, ct, normalize)
         #     for kf, txn_id, ct, *normalize in known_fields()
@@ -94,10 +106,10 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
         ))
 
         mapping = []
-        mapping.extend(self.get_mapping(fields, known, existing, extraFields))
+        mapping.extend(self.get_mapping(fields, known, existing, extraFields, cts))
         extraFields = list(map(list, sorted(extraFields)))
         extraFieldsMapping = self.get_mapping([x[1] for x in extraFields],
-                                              known, existing, None)
+                                              known, existing, None, cts)
         assert len(extraFields) == len(extraFieldsMapping)
         mapping.extend(extraFieldsMapping)
 
