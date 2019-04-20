@@ -3,7 +3,7 @@ import tabulator
 import logging
 
 from .config import Config
-from ..config.consts import CONFIG_SKIP_ROWS, CONFIG_TAXONOMY_ID
+from ..config.consts import CONFIG_SKIP_ROWS, CONFIG_TAXONOMY_ID, CONFIG_FORMAT
 from ..taxonomies import TaxonomyRegistry, Taxonomy
 
 
@@ -26,9 +26,10 @@ class Context():
 
     def _structure_params(self):
         skip_rows = self.config.get(CONFIG_SKIP_ROWS) if CONFIG_SKIP_ROWS in self.config else None
+        fmt = self.config.get(CONFIG_FORMAT)
         return dict(
             headers=skip_rows + 1 if skip_rows is not None else None,
-            ignore_blank_headers=True,  # (skip_rows or 0) > 0,  # Temporary hack as tabulator is kind of limited here
+            ignore_blank_headers=fmt in ('csv', 'xlsx', 'xls'),  # (skip_rows or 0) > 0,  # Temporary hack as tabulator is kind of limited here
             post_parse=[trimmer]
         )
 
@@ -38,9 +39,9 @@ class Context():
     @property
     def stream(self):
         if self._stream is None:
+            source = copy.deepcopy(self.config._unflatten().get('source', {}))
+            structure = self._structure_params()
             try:
-                source = copy.deepcopy(self.config._unflatten().get('source', {}))
-                structure = self._structure_params()
                 logging.info('Opening stream %s', source.get('path'))
                 self._stream = tabulator.Stream(source.pop('path'), **source, **structure).open()
                 for k in source.keys():
@@ -48,7 +49,7 @@ class Context():
                 for k in structure.keys():
                     self.config.get('structure.' + k)
             except Exception:
-                logging.exception('Failed to open URL')
+                logging.exception('Failed to open URL, source=%r, structure=%r', source, structure)
                 raise
         return self._stream
 

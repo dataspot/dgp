@@ -3,6 +3,7 @@ from .file_format import FileFormatAnalyzer
 from .csv_format import CSVFormatAnalyzer
 from .xls_format import XLSFormatAnalyzer
 from .gsheet_format import GSheetFormatAnalyzer
+from .json_format import JsonFormatAnalyzer
 
 
 class FileFormatDGP(BaseDataGenusProcessor):
@@ -13,4 +14,5 @@ class FileFormatDGP(BaseDataGenusProcessor):
             CSVFormatAnalyzer,
             XLSFormatAnalyzer,
             GSheetFormatAnalyzer,
+            JsonFormatAnalyzer,
         ])

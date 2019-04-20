@@ -8,6 +8,7 @@ CONFIG_HEADERS = 'source.headers'
 CONFIG_SHEET = 'source.sheet'
 CONFIG_SHEET_NAMES = 'source.sheet_names'
 CONFIG_FORCE_STRINGS = 'source.force_strings'
+CONFIG_JSON_PROPERTY = 'source.property'
 
 CONFIG_SKIP_ROWS = 'structure.skip_rows'
 CONFIG_SKIP_COLS = 'structure.skip_cols'

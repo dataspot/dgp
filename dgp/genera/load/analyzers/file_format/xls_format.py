@@ -23,4 +23,5 @@ class XLSFormatAnalyzer(BaseAnalyzer):
                 for i, name in
                 enumerate(self.context.stream._Stream__parser._XLSXParser__book.sheetnames)
             ]
-        self.config.setdefault(CONFIG_SHEET, self.config[CONFIG_SHEET_NAMES][0][1])
+        if self.config[CONFIG_FORMAT].startswith('xls'):
+            self.config.setdefault(CONFIG_SHEET, self.config[CONFIG_SHEET_NAMES][0][1])

@@ -1,13 +1,18 @@
 from dataflows import Flow, concatenate, add_computed_field, \
     unpivot, set_primary_key, PackageWrapper, set_type
 
-from ...core import BaseDataGenusProcessor
+from ...core import BaseDataGenusProcessor, Validator, Required
 from .analyzers import TaxonomiesDGP, MappingDGP
 from ...config.consts import CONFIG_MODEL_EXTRA_FIELDS, CONFIG_MODEL_MAPPING,\
             CONFIG_TAXONOMY_CT, CONFIG_CONSTANTS, RESOURCE_NAME
 
 
 class TransformDGP(BaseDataGenusProcessor):
+
+    PRE_CHECKS = Validator(
+        Required(CONFIG_TAXONOMY_CT)
+    )
+
     def init(self):
         self.steps = self.init_classes([
             TaxonomiesDGP,

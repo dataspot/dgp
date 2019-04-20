@@ -47,3 +47,20 @@ class Required(BaseValidator):
             return []
         else:
             return [ConfigValidationError(self.MISSING, self.key, description=self.description)]
+
+
+class Empty(BaseValidator):
+    def __init__(self, key, description=None):
+        self.key = key
+        self.description = description
+
+    def check(self, config):
+        if self.key in config:
+            if not config[self.key]:
+                return []
+            else:
+                return [ConfigValidationError(self.INVALID, self.key,
+                        description=self.description)]
+        else:
+            return [ConfigValidationError(self.MISSING, self.key,
+                    description=self.description)]
