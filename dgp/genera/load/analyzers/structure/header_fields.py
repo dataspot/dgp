@@ -1,5 +1,5 @@
 from .....core import BaseAnalyzer, Validator, Required
-from ....consts import CONFIG_SKIP_ROWS, CONFIG_SKIP_COLS, CONFIG_HEADER_FIELDS
+from .....config.consts import CONFIG_SKIP_ROWS, CONFIG_SKIP_COLS, CONFIG_HEADER_FIELDS
 
 
 class HeaderFieldsAnalyzer(BaseAnalyzer):

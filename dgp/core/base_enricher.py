@@ -6,7 +6,7 @@ from dataflows import load, concatenate, join, set_type, checkpoint,\
 
 from .config import Config
 from .context import Context
-from ..genera.consts import RESOURCE_NAME
+from ..config.consts import RESOURCE_NAME
 
 
 class BaseEnricher:

@@ -24,6 +24,8 @@ class BaseDataGenusProcessor:
     def init_classes(self, classes):
         return [
             cls(self.config, self.context)
+            if isinstance(cls, type)
+            else cls
             for cls in classes
         ]
 

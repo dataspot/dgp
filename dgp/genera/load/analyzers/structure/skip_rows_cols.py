@@ -1,5 +1,5 @@
 from .....core import BaseAnalyzer
-from ....consts import CONFIG_SKIP_ROWS, CONFIG_SKIP_COLS, CONFIG_HEADER_COUNT
+from .....config.consts import CONFIG_SKIP_ROWS, CONFIG_SKIP_COLS, CONFIG_HEADER_COUNT
 
 
 class SkipRowsColsAnalyzer(BaseAnalyzer):

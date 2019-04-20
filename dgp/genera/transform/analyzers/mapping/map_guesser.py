@@ -1,5 +1,5 @@
 from .....core import BaseAnalyzer, Validator, Required
-from ....consts import CONFIG_HEADER_FIELDS, CONFIG_TAXONOMY_ID, CONFIG_MODEL_EXTRA_FIELDS, \
+from .....config.consts import CONFIG_HEADER_FIELDS, CONFIG_TAXONOMY_ID, CONFIG_MODEL_EXTRA_FIELDS, \
         CONFIG_TAXONOMY_CT, CONFIG_CONSTANTS, CONFIG_MODEL_MAPPING
 
 

@@ -2,7 +2,7 @@ from collections import Counter
 
 from .....core import BaseAnalyzer, Validator, Required
 from .....taxonomies import Taxonomy
-from ....consts import CONFIG_HEADER_FIELDS, CONFIG_TAXONOMY_ID
+from .....config.consts import CONFIG_HEADER_FIELDS, CONFIG_TAXONOMY_ID
 
 
 class TaxonomyGuesserAnalyzer(BaseAnalyzer):

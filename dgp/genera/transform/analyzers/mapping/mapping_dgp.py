@@ -2,7 +2,7 @@ from .....core import BaseDataGenusProcessor
 from .map_guesser import MappingGuesserAnalyzer
 from .mandatory_fields import MandatoryFieldsAnalyzer
 
-from ....consts import CONFIG_MODEL_MAPPING, CONFIG_CONSTANTS
+from .....config.consts import CONFIG_MODEL_MAPPING, CONFIG_CONSTANTS
 
 
 class MappingDGP(BaseDataGenusProcessor):

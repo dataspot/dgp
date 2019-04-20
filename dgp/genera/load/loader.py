@@ -6,7 +6,7 @@ from dataflows import Flow, load, PackageWrapper, dump_to_path
 
 from ...core import BaseDataGenusProcessor, Required, Validator
 from .analyzers import FileFormatDGP, StructureDGP
-from ..consts import CONFIG_URL, CONFIG_MODEL_EXTRA_FIELDS, CONFIG_TAXONOMY_CT,\
+from ...config.consts import CONFIG_URL, CONFIG_MODEL_EXTRA_FIELDS, CONFIG_TAXONOMY_CT,\
     CONFIG_MODEL_MAPPING, CONFIG_TAXONOMY_ID, RESOURCE_NAME
 
 

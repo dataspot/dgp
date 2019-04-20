@@ -1,5 +1,5 @@
 from .....core import BaseAnalyzer, Validator, Required
-from ....consts import CONFIG_FORMAT, CONFIG_FORMAT_, CONFIG_ENCODING
+from .....config.consts import CONFIG_FORMAT, CONFIG_FORMAT_, CONFIG_ENCODING
 
 
 class CSVFormatAnalyzer(BaseAnalyzer):

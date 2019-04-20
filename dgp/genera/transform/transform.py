@@ -3,7 +3,7 @@ from dataflows import Flow, concatenate, add_computed_field, \
 
 from ...core import BaseDataGenusProcessor
 from .analyzers import TaxonomiesDGP, MappingDGP
-from ..consts import CONFIG_MODEL_EXTRA_FIELDS, CONFIG_MODEL_MAPPING,\
+from ...config.consts import CONFIG_MODEL_EXTRA_FIELDS, CONFIG_MODEL_MAPPING,\
             CONFIG_TAXONOMY_CT, CONFIG_CONSTANTS, RESOURCE_NAME
 
 

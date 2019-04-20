@@ -3,7 +3,7 @@ import tabulator
 import logging
 
 from .config import Config
-from ..genera.consts import CONFIG_SKIP_ROWS, CONFIG_TAXONOMY_ID
+from ..config.consts import CONFIG_SKIP_ROWS, CONFIG_TAXONOMY_ID
 from ..taxonomies import TaxonomyRegistry, Taxonomy
 
 
