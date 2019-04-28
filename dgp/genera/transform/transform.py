@@ -1,17 +1,14 @@
 from dataflows import Flow, concatenate, add_computed_field, \
     unpivot, set_primary_key, PackageWrapper, set_type
+from dataflows.base.schema_validator import ignore
 
 from ...core import BaseDataGenusProcessor, Validator, Required
 from .analyzers import TaxonomiesDGP, MappingDGP
 from ...config.consts import CONFIG_MODEL_EXTRA_FIELDS, CONFIG_MODEL_MAPPING,\
-            CONFIG_TAXONOMY_CT, CONFIG_CONSTANTS, RESOURCE_NAME
+            CONFIG_TAXONOMY_CT, CONFIG_CONSTANTS, RESOURCE_NAME, CONFIG_PRIMARY_KEY
 
 
 class TransformDGP(BaseDataGenusProcessor):
-
-    PRE_CHECKS = Validator(
-        Required(CONFIG_TAXONOMY_CT)
-    )
 
     def init(self):
         self.steps = self.init_classes([
@@ -34,6 +31,7 @@ class TransformDGP(BaseDataGenusProcessor):
             for t in self.config.get(CONFIG_TAXONOMY_CT):
                 if f['columnType'] == t['name']:
                     f['type'] = t['dataType']
+
         return field_defs
 
     def copy_names_to_titles(self):
@@ -44,31 +42,32 @@ class TransformDGP(BaseDataGenusProcessor):
             yield from package
         return func
 
-    def unique_column_types(self):
-        columnTypes = self.config.get(CONFIG_TAXONOMY_CT)
-        return set(
-            c['name']
-            for c in columnTypes
-            if c.get('unique')
-        )
-
     def ct_to_fn(self, ct):
         return ct.replace(':', '-')
 
     def flow(self):
         if len(self.errors) == 0:
-            uniqueColumnTypes = self.unique_column_types()
-            primaryKey = [
-                self.ct_to_fn(f['columnType'])
-                for f in self.config.get(CONFIG_MODEL_MAPPING)
-                if f.get('columnType') in uniqueColumnTypes
-            ]
+            primaryKey = [self.ct_to_fn(f) for f in self.config.get(CONFIG_PRIMARY_KEY)]
             extraFieldDefs = self.join_mapping_taxonomy('extra')
             normalizeFieldDef = self.join_mapping_taxonomy('normalize')
             if len(normalizeFieldDef) > 0:
                 normalizeFieldDef = normalizeFieldDef[0]
             else:
                 normalizeFieldDef = None
+            fieldOptions = {}
+            for mf in self.config.get(CONFIG_MODEL_MAPPING):
+                for tf in self.config.get(CONFIG_TAXONOMY_CT):
+                    if mf.get('columnType') == tf['name']:
+                        fieldOptions[tf['name']] = dict(
+                            (k, v)
+                            for k, v in tf.items()
+                            if k not in (
+                                'name', 'title', 'description', 'columnType', 'dataType',
+                                'labelOf', 'unique', 'mandatory', 'alternatives'
+                            )
+                        )
+                        fieldOptions[tf['name']]['type'] = tf['dataType']
+            print('FOFO', fieldOptions)
             steps = [
                 add_computed_field([
                     dict(
@@ -105,8 +104,10 @@ class TransformDGP(BaseDataGenusProcessor):
                 *[
                     set_type(
                         self.ct_to_fn(f['columnType']),
-                        columnType=f['columnType'], 
-                        resources=RESOURCE_NAME
+                        columnType=f['columnType'],
+                        **fieldOptions.get(f['columnType'], {}),
+                        resources=RESOURCE_NAME,
+                        on_error=ignore
                     )
                     for f in self.config.get(CONFIG_MODEL_MAPPING)
                     if f.get('columnType') is not None

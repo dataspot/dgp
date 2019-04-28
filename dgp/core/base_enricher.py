@@ -2,11 +2,12 @@ from hashlib import md5
 
 from dataflows import Flow, PackageWrapper, DataStream
 from dataflows import load, concatenate, join, set_type, checkpoint,\
-                      dump_to_path, add_computed_field, delete_fields
+                      dump_to_path, add_computed_field, delete_fields,\
+                      sort_rows, join_with_self, printer
 
 from .config import Config
 from .context import Context
-from ..config.consts import RESOURCE_NAME
+from ..config.consts import RESOURCE_NAME, CONFIG_PRIMARY_KEY
 
 
 class BaseEnricher:
@@ -180,6 +181,36 @@ class DatapackageJoiner(ColumnTypeTester):
         return f
 
 
+class DuplicateRemover(BaseEnricher):
+
+    # ORDER_BY_KEY = ''
+
+    def test(self):
+        return True
+
+    def postflow(self):
+        key_field_names = [
+            ct.replace(':', '-')
+            for ct in self.config.get(CONFIG_PRIMARY_KEY)
+        ]
+        steps = [
+            sort_rows(
+                self.ORDER_BY_KEY,
+                resources=RESOURCE_NAME
+            ),
+            join_with_self(
+                RESOURCE_NAME,
+                key_field_names,
+                {
+                    **dict((f, {}) for f in key_field_names),
+                    '*': dict(aggregate='last')
+                }
+            ),
+        ]
+        f = Flow(*steps)
+        return f
+
+
 def enrichments_flows(config: Config, context: Context, *classes):
     all_enrichments = [e(config) for e in classes]
     active_enrichments = [e for e in all_enrichments if e.test()]
@@ -198,3 +229,5 @@ def enrichments_flows(config: Config, context: Context, *classes):
             poststeps.append(f)
 
     return Flow(*presteps), Flow(*poststeps)
+
+

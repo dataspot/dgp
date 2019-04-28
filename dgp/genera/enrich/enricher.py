@@ -16,4 +16,8 @@ class EnricherDGP(BaseDataGenusProcessor):
         return self.flows[0]
 
     def flow(self):
-        return self.flows[1]
+        from dataflows import Flow, printer
+        return Flow(
+            self.flows[1],
+            printer()
+        )
