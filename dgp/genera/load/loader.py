@@ -2,7 +2,8 @@ import os
 import json
 from hashlib import md5
 
-from dataflows import Flow, load, PackageWrapper, dump_to_path
+from dataflows import Flow, load, PackageWrapper, dump_to_path, printer
+from dataflows.base.schema_validator import ignore
 
 from ...core import BaseDataGenusProcessor, Required, Validator
 from .analyzers import FileFormatDGP, StructureDGP
@@ -60,6 +61,7 @@ class LoaderDGP(BaseDataGenusProcessor):
                         if entry['name'] == field['name']:
                             field.update(entry)
                             break
+                    field.update(field.pop('options', {}))
                     if 'normalize' in field:
                         columnType = normalizationColumnType
                     else:
@@ -69,6 +71,7 @@ class LoaderDGP(BaseDataGenusProcessor):
                             if columnType == entry['name']:
                                 if 'dataType' in entry:
                                     field['type'] = entry['dataType']
+                                field.update(entry.get('options', {}))
                                 break
 
             # Our own additions
@@ -98,13 +101,15 @@ class LoaderDGP(BaseDataGenusProcessor):
                 Flow(
                     load(source.pop('path'), validate=False,
                          name=RESOURCE_NAME,
-                         **source, **structure_params),
-                    dump_to_path(cache_path),
+                         **source, **structure_params,
+                         infer_strategy=load.INFER_PYTHON_TYPES,
+                         cast_strategy=load.CAST_DO_NOTHING),
+                    dump_to_path(cache_path, validator_options=dict(on_error=ignore)),
                     self.create_fdp(),
+                    # printer(),
                 ).process()
             print('Using cached source data from {}'.format(cache_path))
             return Flow(
-                load(datapackage_path, validate=False,
-                     resources=RESOURCE_NAME),
+                load(datapackage_path, resources=RESOURCE_NAME),
                 self.create_fdp(),
             )

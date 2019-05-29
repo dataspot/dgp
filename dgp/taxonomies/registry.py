@@ -64,13 +64,21 @@ class TaxonomyRegistry():
                     ('config', None),
                     ]:
                 value = v.get(key)
+                arg = None
                 if value is not None:
-                    if isinstance(value, str):
-                        with open(os.path.join(base_path, value)) as in_file:
-                            value = loader(in_file)
+                    if not isinstance(value, list):
+                        value = [value]
+                    for item in value:
+                        if isinstance(item, str):
+                            with open(os.path.join(base_path, item)) as in_file:
+                                item = loader(in_file)
+                        if arg is None:
+                            arg = item
+                        else:
+                            arg += item
                 else:
-                    value = {}
-                args.append(value)
+                    arg = {}
+                args.append(arg)
 
             ret[id] = Taxonomy(id, *args)
         return ret

@@ -55,19 +55,18 @@ class TransformDGP(BaseDataGenusProcessor):
             else:
                 normalizeFieldDef = None
             fieldOptions = {}
+            dataTypes = dict(
+                (ct['name'], dict(
+                    ct.get('options', {}),
+                    type=ct['dataType']
+                ))
+                for ct in self.config.get(CONFIG_TAXONOMY_CT)
+                if 'dataType' in ct
+            )
             for mf in self.config.get(CONFIG_MODEL_MAPPING):
-                for tf in self.config.get(CONFIG_TAXONOMY_CT):
-                    if mf.get('columnType') == tf['name']:
-                        fieldOptions[tf['name']] = dict(
-                            (k, v)
-                            for k, v in tf.items()
-                            if k not in (
-                                'name', 'title', 'description', 'columnType', 'dataType',
-                                'labelOf', 'unique', 'mandatory', 'alternatives'
-                            )
-                        )
-                        fieldOptions[tf['name']]['type'] = tf['dataType']
-            print('FOFO', fieldOptions)
+                ct = mf.get('columnType')
+                if ct is not None:
+                    fieldOptions[ct] = dataTypes.get(ct, {})
             steps = [
                 add_computed_field([
                     dict(
