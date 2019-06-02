@@ -3,7 +3,7 @@ from hashlib import md5
 from dataflows import Flow, PackageWrapper, DataStream
 from dataflows import load, concatenate, join, set_type, checkpoint,\
                       dump_to_path, add_computed_field, delete_fields,\
-                      sort_rows, join_with_self, printer
+                      sort_rows, join_with_self, printer, set_primary_key
 
 from .config import Config
 from .context import Context
@@ -193,7 +193,18 @@ class DuplicateRemover(BaseEnricher):
             ct.replace(':', '-')
             for ct in self.config.get(CONFIG_PRIMARY_KEY)
         ]
+
+        def save_pks(saved_pk):
+            def func(package: PackageWrapper):
+                for res in package.pkg.resources:
+                    if res.name == RESOURCE_NAME:
+                        saved_pk['pk'] = res.schema.descriptor.get('primaryKey', [])
+                        print('SAVED PK', saved_pk)
+            return func
+
+        saved_pk = dict(pk=[])
         steps = [
+            save_pks(saved_pk),
             sort_rows(
                 self.ORDER_BY_KEY,
                 resources=RESOURCE_NAME
@@ -206,6 +217,7 @@ class DuplicateRemover(BaseEnricher):
                     '*': dict(aggregate='last')
                 }
             ),
+            set_primary_key(saved_pk['pk'], RESOURCE_NAME)
         ]
         f = Flow(*steps)
         return f
