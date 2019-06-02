@@ -200,6 +200,8 @@ class DuplicateRemover(BaseEnricher):
                     if res.name == RESOURCE_NAME:
                         saved_pk['pk'] = res.schema.descriptor.get('primaryKey', [])
                         print('SAVED PK', saved_pk)
+                yield package.pkg
+                yield from package
             return func
 
         saved_pk = dict(pk=[])
