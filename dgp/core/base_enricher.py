@@ -196,10 +196,18 @@ class DuplicateRemover(BaseEnricher):
 
         def save_pks(saved_pk):
             def func(package: PackageWrapper):
-                for res in package.pkg.resources:
-                    if res.name == RESOURCE_NAME:
-                        saved_pk['pk'] = res.schema.descriptor.get('primaryKey', [])
-                        print('SAVED PK', saved_pk)
+                for res in package.pkg.descriptor['resources']:
+                    if res['name'] == RESOURCE_NAME:
+                        saved_pk['pk'] = res['schema'].get('primaryKey', [])
+                yield package.pkg
+                yield from package
+            return func
+
+        def restore_pks(saved_pk):
+            def func(package: PackageWrapper):
+                for res in package.pkg.descriptor['resources']:
+                    if res['name'] == RESOURCE_NAME:
+                        res['schema']['primaryKey'] = saved_pk['pk']
                 yield package.pkg
                 yield from package
             return func
@@ -219,7 +227,7 @@ class DuplicateRemover(BaseEnricher):
                     '*': dict(aggregate='last')
                 }
             ),
-            set_primary_key(saved_pk['pk'], RESOURCE_NAME)
+            restore_pks(saved_pk)
         ]
         f = Flow(*steps)
         return f
