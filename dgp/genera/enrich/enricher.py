@@ -21,9 +21,9 @@ class EnricherDGP(BaseDataGenusProcessor):
         if self.flows:
             return Flow(
                 self.flows[1],
-                printer()
+#                printer()
             )
         else:
             return Flow(
-                printer()
+#                printer()
             )

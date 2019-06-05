@@ -8,7 +8,7 @@ from dataflows.base.schema_validator import ignore
 from ...core import BaseDataGenusProcessor, Required, Validator
 from .analyzers import FileFormatDGP, StructureDGP
 from ...config.consts import CONFIG_URL, CONFIG_MODEL_EXTRA_FIELDS, CONFIG_TAXONOMY_CT,\
-    CONFIG_MODEL_MAPPING, CONFIG_TAXONOMY_ID, RESOURCE_NAME
+    CONFIG_MODEL_MAPPING, CONFIG_TAXONOMY_ID, CONFIG_PUBLISH_ALLOWED, RESOURCE_NAME
 
 
 class LoaderDGP(BaseDataGenusProcessor):
@@ -91,7 +91,7 @@ class LoaderDGP(BaseDataGenusProcessor):
 
             config = self.config._unflatten()
             source = config['source']
-            ref_hash = self.hash_key(source, config['structure'])
+            ref_hash = self.hash_key(source, config['structure'], config.get('publish'))
             cache_path = os.path.join('.cache', ref_hash)
             datapackage_path = os.path.join(cache_path, 'datapackage.json')
 
@@ -103,7 +103,8 @@ class LoaderDGP(BaseDataGenusProcessor):
                          name=RESOURCE_NAME,
                          **source, **structure_params,
                          infer_strategy=load.INFER_PYTHON_TYPES,
-                         cast_strategy=load.CAST_DO_NOTHING),
+                         cast_strategy=load.CAST_DO_NOTHING,
+                         limit_rows=None if self.config.get(CONFIG_PUBLISH_ALLOWED) else 5000),
                     dump_to_path(cache_path, validator_options=dict(on_error=ignore)),
                     self.create_fdp(),
                     # printer(),
