@@ -94,23 +94,34 @@ class LoaderDGP(BaseDataGenusProcessor):
             ref_hash = self.hash_key(source, config['structure'], config.get('publish'))
             cache_path = os.path.join('.cache', ref_hash)
             datapackage_path = os.path.join(cache_path, 'datapackage.json')
+            structure_params = self.context._structure_params()
+            loader = load(source.pop('path'), validate=False,
+                          name=RESOURCE_NAME,
+                          **source, **structure_params,
+                          infer_strategy=load.INFER_PYTHON_TYPES,
+                          cast_strategy=load.CAST_DO_NOTHING,
+                          limit_rows=(
+                              None
+                              if self.config.get(CONFIG_PUBLISH_ALLOWED)
+                              else 5000
+                          ))
 
-            if not os.path.exists(datapackage_path):
-                print('Caching source data into {}'.format(cache_path))
-                structure_params = self.context._structure_params()
-                Flow(
-                    load(source.pop('path'), validate=False,
-                         name=RESOURCE_NAME,
-                         **source, **structure_params,
-                         infer_strategy=load.INFER_PYTHON_TYPES,
-                         cast_strategy=load.CAST_DO_NOTHING,
-                         limit_rows=None if self.config.get(CONFIG_PUBLISH_ALLOWED) else 5000),
-                    dump_to_path(cache_path, validator_options=dict(on_error=ignore)),
+            if self.config.get(CONFIG_PUBLISH_ALLOWED):
+                return Flow(
+                    loader,
                     self.create_fdp(),
-                    # printer(),
-                ).process()
-            print('Using cached source data from {}'.format(cache_path))
-            return Flow(
-                load(datapackage_path, resources=RESOURCE_NAME),
-                self.create_fdp(),
-            )
+                )
+            else:
+                if not os.path.exists(datapackage_path):
+                    print('Caching source data into {}'.format(cache_path))
+                    Flow(
+                        loader,
+                        dump_to_path(cache_path, validator_options=dict(on_error=ignore)),
+                        self.create_fdp(),
+                        # printer(),
+                    ).process()
+                print('Using cached source data from {}'.format(cache_path))
+                return Flow(
+                    load(datapackage_path, resources=RESOURCE_NAME),
+                    self.create_fdp(),
+                )

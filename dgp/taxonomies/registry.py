@@ -23,10 +23,18 @@ class Taxonomy():
                  processing_module, config):
         self.id = id
         self.title = title
-        self.column_types = column_types
         self.header_mapping = header_mapping
         self.processing_module = processing_module
         self.config = config
+
+        ct_names = []
+        specs = {}
+        for spec in column_types:
+            ct = spec['name']
+            specs.setdefault(ct, {}).update(spec)
+            if ct not in ct_names:
+                ct_names.append(ct)
+        self.column_types = [specs[ct] for ct in ct_names]
 
     def flows(self, config, context):
         if self.processing_module:
