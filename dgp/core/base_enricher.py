@@ -8,6 +8,7 @@ from dataflows import load, concatenate, join, set_type, checkpoint,\
 from .config import Config
 from .context import Context
 from ..config.consts import RESOURCE_NAME, CONFIG_PRIMARY_KEY
+from ..config.log import logger
 
 
 class BaseEnricher:
@@ -132,7 +133,7 @@ class DatapackageJoiner(ColumnTypeTester):
                  rename_last_resource(self.ref_hash),
                  dump_to_path('.cache/{}'.format(self.ref_hash)),
                  check).process()
-        print('DONE PREPARING', self.key)
+        logger.debug('DONE PREPARING %t', self.key)
 
     def preflow(self):
         f = Flow(

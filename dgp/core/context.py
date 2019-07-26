@@ -1,8 +1,8 @@
 import copy
 import tabulator
-import logging
 
 from .config import Config
+from ..config.log import logger
 from ..config.consts import CONFIG_SKIP_ROWS, CONFIG_TAXONOMY_ID, CONFIG_FORMAT
 from ..taxonomies import TaxonomyRegistry, Taxonomy
 
@@ -42,14 +42,14 @@ class Context():
             source = copy.deepcopy(self.config._unflatten().get('source', {}))
             structure = self._structure_params()
             try:
-                logging.info('Opening stream %s', source.get('path'))
+                logger.info('Opening stream %s', source.get('path'))
                 self._stream = tabulator.Stream(source.pop('path'), **source, **structure).open()
                 for k in source.keys():
                     self.config.get('source.' + k)
                 for k in structure.keys():
                     self.config.get('structure.' + k)
             except Exception:
-                logging.exception('Failed to open URL, source=%r, structure=%r', source, structure)
+                logger.exception('Failed to open URL, source=%r, structure=%r', source, structure)
                 raise
         return self._stream
 

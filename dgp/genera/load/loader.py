@@ -3,13 +3,14 @@ import json
 import requests
 from hashlib import md5
 
-from dataflows import Flow, load, PackageWrapper, dump_to_path, printer
+from dataflows import Flow, load, PackageWrapper, dump_to_path #, printer
 from dataflows.base.schema_validator import ignore
 
 from ...core import BaseDataGenusProcessor, Required, Validator
 from .analyzers import FileFormatDGP, StructureDGP
 from ...config.consts import CONFIG_URL, CONFIG_MODEL_EXTRA_FIELDS, CONFIG_TAXONOMY_CT,\
     CONFIG_MODEL_MAPPING, CONFIG_TAXONOMY_ID, CONFIG_PUBLISH_ALLOWED, RESOURCE_NAME
+from ...config.log import logger
 
 
 class LoaderDGP(BaseDataGenusProcessor):
@@ -117,14 +118,14 @@ class LoaderDGP(BaseDataGenusProcessor):
                 )
             else:
                 if not os.path.exists(datapackage_path):
-                    print('Caching source data into {}'.format(cache_path))
+                    logger.info('Caching source data into %s', cache_path)
                     Flow(
                         loader,
                         dump_to_path(cache_path, validator_options=dict(on_error=ignore)),
                         self.create_fdp(),
                         # printer(),
                     ).process()
-                print('Using cached source data from {}'.format(cache_path))
+                logger.info('Using cached source data from %s', cache_path)
                 return Flow(
                     load(datapackage_path, resources=RESOURCE_NAME),
                     self.create_fdp(),

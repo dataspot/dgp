@@ -13,3 +13,4 @@ class TaxonomyFetcherAnalyzer(BaseAnalyzer):
         tid = self.config.get(CONFIG_TAXONOMY_ID)
         t: Taxonomy = self.context.taxonomies.get(tid)
         self.config[CONFIG_TAXONOMY_CT] = t.column_types
+        self.config[CONFIG_TAXONOMY_SETTINGS] = t.config

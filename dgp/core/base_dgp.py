@@ -2,6 +2,7 @@ from dataflows import Flow
 
 from .config import Config
 from .context import Context
+from ..config.log import logger
 
 
 class BaseDataGenusProcessor:
@@ -61,12 +62,12 @@ class BaseAnalyzer(BaseDataGenusProcessor):
         if self.test():
             state_key = self.__class__.__name__
             if self.config.dirty_state(state_key):
-                print('DIRTY', state_key)
+                logger.debug('DIRTY %r', state_key)
                 self.config.reset_state(state_key)
                 self.run()
                 self.config.write_state(state_key)
             else:
-                print('NOT DIRTY', state_key)
+                logger.debug('NOT DIRTY %r', state_key)
             return True
         return False
 

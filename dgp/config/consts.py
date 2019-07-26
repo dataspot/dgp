@@ -18,6 +18,7 @@ CONFIG_HEADER_FIELDS = 'structure.headers'
 CONFIG_TAXONOMY_LIST = 'taxonomy.options'
 CONFIG_TAXONOMY_ID = 'taxonomy.id'
 CONFIG_TAXONOMY_CT = 'taxonomy.columnTypes'
+CONFIG_TAXONOMY_SETTINGS = 'taxonomy.settings'
 
 CONFIG_CONSTANTS = 'constants'
 

@@ -1,7 +1,7 @@
 from .....core import BaseAnalyzer, Validator, Required
 from .....config.consts import CONFIG_HEADER_FIELDS, CONFIG_TAXONOMY_ID, CONFIG_MODEL_EXTRA_FIELDS, \
         CONFIG_TAXONOMY_CT, CONFIG_CONSTANTS, CONFIG_MODEL_MAPPING
-
+from .....config.log import logger
 
 class MappingGuesserAnalyzer(BaseAnalyzer):
 
@@ -25,7 +25,7 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
                             ct = kv.get('type')
                             full_ct = cts.get(ct)
                             if full_ct is None:
-                                print('Failed to find columnType entry for known mapping {} -> {}'.format(kf, kv))
+                                logger.info('Failed to find columnType entry for known mapping %s -> %s', kf, kv)
                                 continue
                             normalize = kv.get('normalize')
                             if normalize is not None:
