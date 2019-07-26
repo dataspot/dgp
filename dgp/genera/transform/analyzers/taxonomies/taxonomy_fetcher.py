@@ -1,6 +1,6 @@
 from .....core import BaseAnalyzer, Validator, Required
 from .....taxonomies import Taxonomy
-from .....config.consts import CONFIG_TAXONOMY_ID, CONFIG_TAXONOMY_CT
+from .....config.consts import CONFIG_TAXONOMY_ID, CONFIG_TAXONOMY_CT, CONFIG_TAXONOMY_SETTINGS
 
 
 class TaxonomyFetcherAnalyzer(BaseAnalyzer):
