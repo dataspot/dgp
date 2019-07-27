@@ -41,6 +41,11 @@ class Taxonomy():
             if hasattr(self.processing_module, 'flows'):
                 return self.processing_module.flows(config, context)
 
+    def analyzers(self, config, context):
+        if self.processing_module:
+            if hasattr(self.processing_module, 'analyzers'):
+                return self.processing_module.analyzers(config, context)
+
 
 class TaxonomyRegistry():
 

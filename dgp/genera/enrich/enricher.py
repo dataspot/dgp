@@ -5,6 +5,11 @@ class EnricherDGP(BaseDataGenusProcessor):
 
     def init(self):
         self._flows = None
+        analyzers = self.context.taxonomy.analyzers(self.config, self.context)
+        if analyzers is not None:
+            self.steps = self.init_classes(
+                self.context.taxonomy.analyzers
+            )
 
     @property
     def flows(self):
@@ -17,13 +22,11 @@ class EnricherDGP(BaseDataGenusProcessor):
             return self.flows[0]
 
     def flow(self):
-        from dataflows import Flow, printer
+        from dataflows import Flow
         if self.flows:
             return Flow(
                 self.flows[1],
-#                printer()
             )
         else:
             return Flow(
-#                printer()
             )
