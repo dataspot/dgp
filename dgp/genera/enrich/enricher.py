@@ -5,11 +5,15 @@ class EnricherDGP(BaseDataGenusProcessor):
 
     def init(self):
         self._flows = None
-        analyzers = self.context.taxonomy.analyzers(self.config, self.context)
-        if analyzers is not None:
-            self.steps = self.init_classes(
-                self.context.taxonomy.analyzers
-            )
+
+    def analyze(self):
+        if not self.steps:
+            analyzers = self.context.taxonomy.analyzers(self.config, self.context)
+            if analyzers is not None:
+                self.steps = self.init_classes(
+                    self.context.taxonomy.analyzers
+                )
+        super().analyze()
 
     @property
     def flows(self):
