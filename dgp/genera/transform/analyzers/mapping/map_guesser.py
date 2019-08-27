@@ -3,6 +3,7 @@ from .....config.consts import CONFIG_HEADER_FIELDS, CONFIG_TAXONOMY_ID, CONFIG_
         CONFIG_TAXONOMY_CT, CONFIG_CONSTANTS, CONFIG_MODEL_MAPPING
 from .....config.log import logger
 
+
 class MappingGuesserAnalyzer(BaseAnalyzer):
 
     REQUIRES = Validator(
@@ -35,7 +36,7 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
                             if ct is None:
                                 field_mapping = dict(
                                     name=field,
-                                    title=full_ct.get(title, field),
+                                    title=field,
                                     normalize=normalize,
                                     normalizeTarget=normalizeTarget
                                 )
