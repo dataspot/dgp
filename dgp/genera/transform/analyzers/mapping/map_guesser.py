@@ -79,6 +79,9 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
             (ct['name'], ct)
             for ct in cts
         )
+        if len(current_mapping) > 0:
+            # Avoid re-guessing mapping after first round
+            known = {}
         # [
         #     (kf, ct, normalize)
         #     for kf, txn_id, ct, *normalize in known_fields()
