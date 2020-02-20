@@ -133,7 +133,7 @@ class DatapackageJoiner(ColumnTypeTester):
                  rename_last_resource(self.ref_hash),
                  dump_to_path('.cache/{}'.format(self.ref_hash)),
                  check).process()
-        logger.debug('DONE PREPARING %t', self.key)
+        logger.debug('DONE PREPARING %s', self.key)
 
     def preflow(self):
         f = Flow(
