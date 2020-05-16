@@ -63,7 +63,6 @@ class LoaderDGP(BaseDataGenusProcessor):
                         if entry['name'] == field['name']:
                             field.update(entry)
                             break
-                    field.update(field.pop('options', {}))
                     if 'normalize' in field:
                         columnType = normalizationColumnType
                     else:
@@ -75,6 +74,7 @@ class LoaderDGP(BaseDataGenusProcessor):
                                     field['type'] = entry['dataType']
                                 field.update(entry.get('options', {}))
                                 break
+                    field.update(field.pop('options', {}))
 
             # Our own additions
             descriptor['taxonomyId'] = self.config[CONFIG_TAXONOMY_ID]

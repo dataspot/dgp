@@ -48,7 +48,9 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
                             else:
                                 field_mapping = dict(
                                     name=field,
-                                    title=field,
+                                    title=full_ct.get('title') or field,
+                                    description=full_ct.get('description') or None,
+                                    options=full_ct.get('options') or {},
                                     columnType=ct
                                 )
                             mapping.append(field_mapping)
