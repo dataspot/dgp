@@ -1,4 +1,4 @@
-from .....core import BaseAnalyzer, Validator, Required, ConfigValidationError
+from .....core import BaseAnalyzer, Validator, Required
 from .....config.consts import CONFIG_TAXONOMY_CT, CONFIG_MODEL_MAPPING, CONFIG_PRIMARY_KEY
 
 

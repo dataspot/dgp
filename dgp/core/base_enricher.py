@@ -3,7 +3,7 @@ from hashlib import md5
 from dataflows import Flow, PackageWrapper, DataStream
 from dataflows import load, concatenate, join, set_type, checkpoint,\
                       dump_to_path, add_computed_field, delete_fields,\
-                      sort_rows, join_with_self, printer, set_primary_key
+                      sort_rows, join_with_self
 
 from .config import Config
 from .context import Context

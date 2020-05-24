@@ -3,7 +3,7 @@ import json
 import requests
 from hashlib import md5
 
-from dataflows import Flow, load, PackageWrapper, dump_to_path #, printer
+from dataflows import Flow, load, PackageWrapper, dump_to_path
 from dataflows.base.schema_validator import ignore
 
 from ...core import BaseDataGenusProcessor, Required, Validator
@@ -98,7 +98,10 @@ class LoaderDGP(BaseDataGenusProcessor):
             datapackage_path = os.path.join(cache_path, 'datapackage.json')
             structure_params = self.context._structure_params()
             session = requests.Session()
-            session.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'}
+            session.headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' +
+                              ' (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'
+            }
             loader = load(source.pop('path'), validate=False,
                           name=RESOURCE_NAME,
                           **source, **structure_params,

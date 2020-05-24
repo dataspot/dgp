@@ -29,7 +29,7 @@ class Context():
         fmt = self.config.get(CONFIG_FORMAT)
         return dict(
             headers=skip_rows + 1 if skip_rows is not None else None,
-            ignore_blank_headers=fmt in ('csv', 'xlsx', 'xls'),  # (skip_rows or 0) > 0,  # Temporary hack as tabulator is kind of limited here
+            ignore_blank_headers=fmt in ('csv', 'xlsx', 'xls'),
             post_parse=[trimmer]
         )
 

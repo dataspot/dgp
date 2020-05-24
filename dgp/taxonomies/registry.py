@@ -6,25 +6,43 @@ import yaml
 
 
 def load_module(py_file):
-    processing_module = None
+    loaded_module = None
     try:
-        spec = spec_from_file_location('{}_processing'.format(id), py_file.name)
+        filename = py_file.name + ''
+        spec = spec_from_file_location('{}'.format(id(filename)), filename)
         if spec is not None:
-            processing_module = module_from_spec(spec)
-            spec.loader.exec_module(processing_module)
+            loaded_module = module_from_spec(spec)
+            spec.loader.exec_module(loaded_module)
     except FileNotFoundError:
         pass
-    return processing_module
+    return loaded_module
+
+
+class ExtensionModule():
+
+    def __init__(self, module):
+        self.module = module
+
+    def analyzers(self, config, context):
+        if self.module:
+            if hasattr(self.module, 'analyzers'):
+                return self.module.analyzers(config, context)
+
+    def flows(self, config, context):
+        if self.module:
+            if hasattr(self.module, 'flows'):
+                return self.module.flows(config, context)
 
 
 class Taxonomy():
 
     def __init__(self, id, title, column_types, header_mapping,
-                 processing_module, config):
+                 processing_module, publishing_module, config):
         self.id = id
         self.title = title
         self.header_mapping = header_mapping
-        self.processing_module = processing_module
+        self.processing = ExtensionModule(processing_module)
+        self.publishing = ExtensionModule(publishing_module)
         self.config = config
 
         ct_names = []
@@ -35,16 +53,6 @@ class Taxonomy():
             if ct not in ct_names:
                 ct_names.append(ct)
         self.column_types = [specs[ct] for ct in ct_names]
-
-    def flows(self, config, context):
-        if self.processing_module:
-            if hasattr(self.processing_module, 'flows'):
-                return self.processing_module.flows(config, context)
-
-    def analyzers(self, config, context):
-        if self.processing_module:
-            if hasattr(self.processing_module, 'analyzers'):
-                return self.processing_module.analyzers(config, context)
 
 
 class TaxonomyRegistry():
@@ -74,6 +82,7 @@ class TaxonomyRegistry():
                     ('column_types', json.load),
                     ('header_mapping', yaml.load),
                     ('processing_module', load_module),
+                    ('publishing_module', load_module),
                     ('config', None),
                     ]:
                 value = v.get(key)

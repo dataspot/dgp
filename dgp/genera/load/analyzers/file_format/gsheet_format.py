@@ -1,5 +1,5 @@
 from .....core import BaseAnalyzer, Validator, Required
-from .....config.consts import CONFIG_FORMAT, CONFIG_SHEET, CONFIG_FORCE_STRINGS, CONFIG_SHEET_NAMES
+from .....config.consts import CONFIG_FORMAT, CONFIG_FORCE_STRINGS
 
 
 class GSheetFormatAnalyzer(BaseAnalyzer):

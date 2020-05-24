@@ -9,7 +9,7 @@ from .enrich import EnricherDGP
 class SimpleDGP(BaseDataGenusProcessor):
 
     def init(self,
-             steps = [
+             steps=[
                  LoaderDGP,
                  TransformDGP,
                  EnricherDGP,
