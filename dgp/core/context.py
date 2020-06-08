@@ -42,8 +42,11 @@ class Context():
             source = copy.deepcopy(self.config._unflatten().get('source', {}))
             structure = self._structure_params()
             try:
-                logger.info('Opening stream %s', source.get('path'))
-                self._stream = tabulator.Stream(source.pop('path'), **source, **structure).open()
+                path = source.pop('path')
+                if not path:
+                    return None
+                logger.info('Opening stream %s', path)
+                self._stream = tabulator.Stream(path, **source, **structure).open()
                 for k in source.keys():
                     self.config.get('source.' + k)
                 for k in structure.keys():
