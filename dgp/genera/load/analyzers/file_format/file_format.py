@@ -6,4 +6,5 @@ class FileFormatAnalyzer(BaseAnalyzer):
 
     def run(self):
         stream = self.context.stream
-        self.config[CONFIG_FORMAT] = stream.format
+        if stream is not None:
+            self.config[CONFIG_FORMAT] = stream.format

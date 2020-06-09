@@ -8,9 +8,12 @@ class SkipRowsColsAnalyzer(BaseAnalyzer):
         if CONFIG_SKIP_COLS in self.config or CONFIG_SKIP_ROWS in self.config:
             return True
 
+        stream = self.context.stream
+        if stream is None:
+            return True
+
         self.config[CONFIG_SKIP_ROWS] = 0
         self.config[CONFIG_SKIP_COLS] = 0
-        stream = self.context.stream
         sample = stream.sample
         max_score = None
 

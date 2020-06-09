@@ -12,7 +12,8 @@ class HeaderFieldsAnalyzer(BaseAnalyzer):
     def run(self):
         self.context.reset_stream()
         stream = self.context.stream
-        if stream.headers is not None:
-            self.config[CONFIG_HEADER_FIELDS] = stream.headers
-        else:
-            self.config[CONFIG_HEADER_FIELDS] = []
+        if stream is not None:
+            if stream.headers is not None:
+                self.config[CONFIG_HEADER_FIELDS] = stream.headers
+            else:
+                self.config[CONFIG_HEADER_FIELDS] = []
