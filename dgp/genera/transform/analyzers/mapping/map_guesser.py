@@ -75,8 +75,9 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
         known = self.context.taxonomies.get(taxonomy_id).header_mapping
         cts = self.context.taxonomies.get(taxonomy_id).column_types
         for ct in cts:
-            if ct['title'] not in known:
-                known[ct['title']] = dict(type=ct['name'])
+            for f in ('title', 'name'):
+                if ct[f] not in known:
+                    known[ct[f]] = dict(type=ct['name'])
         cts = dict(
             (ct['name'], ct)
             for ct in cts
