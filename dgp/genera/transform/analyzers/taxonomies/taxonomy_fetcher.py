@@ -14,3 +14,9 @@ class TaxonomyFetcherAnalyzer(BaseAnalyzer):
         t: Taxonomy = self.context.taxonomies.get(tid)
         self.config[CONFIG_TAXONOMY_CT] = t.column_types
         self.config[CONFIG_TAXONOMY_SETTINGS] = t.config
+
+    def analyze(self):
+        if self.test():
+            self.run()
+            return True
+        return False
