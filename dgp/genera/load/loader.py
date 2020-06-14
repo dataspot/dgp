@@ -57,7 +57,6 @@ class LoaderDGP(BaseDataGenusProcessor):
             if self.config.get(CONFIG_PUBLISH_ALLOWED):
                 return Flow(
                     loader,
-                    self.create_fdp(),
                 )
             else:
                 if not os.path.exists(datapackage_path):
@@ -65,7 +64,6 @@ class LoaderDGP(BaseDataGenusProcessor):
                     Flow(
                         loader,
                         dump_to_path(cache_path, validator_options=dict(on_error=ignore)),
-                        self.create_fdp(),
                         # printer(),
                     ).process()
                 logger.info('Using cached source data from %s', cache_path)
