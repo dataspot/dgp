@@ -5,7 +5,8 @@ from dataflows.base.schema_validator import ignore
 from ...core import BaseDataGenusProcessor
 from .analyzers import TaxonomiesDGP, MappingDGP
 from ...config.consts import CONFIG_MODEL_EXTRA_FIELDS, CONFIG_MODEL_MAPPING,\
-            CONFIG_TAXONOMY_CT, CONFIG_CONSTANTS, RESOURCE_NAME, CONFIG_PRIMARY_KEY
+            CONFIG_TAXONOMY_CT, CONFIG_CONSTANTS, RESOURCE_NAME,\
+            CONFIG_PRIMARY_KEY, CONFIG_TAXONOMY_ID
 
 
 class TransformDGP(BaseDataGenusProcessor):
@@ -45,6 +46,65 @@ class TransformDGP(BaseDataGenusProcessor):
     def ct_to_fn(self, ct):
         return ct.replace(':', '-')
 
+    def create_fdp(self):
+
+        def func(package: PackageWrapper):
+            descriptor = package.pkg.descriptor
+            # Mandatory stuff
+            columnTypes = self.config[CONFIG_TAXONOMY_CT]
+            descriptor['columnTypes'] = columnTypes
+
+            resource = descriptor['resources'][-1]
+            resource['path'] = 'out.csv'
+            resource['format'] = 'csv'
+            resource['mediatype'] = 'text/csv'
+            for k in ('headers', 'encoding', 'sheet'):
+                if k in resource:
+                    del resource[k]
+
+            schema = resource['schema']
+
+            schema['extraFields'] = []
+            normalizationColumnType = None
+            if self.config[CONFIG_MODEL_EXTRA_FIELDS]:
+                for kind, field, *value in self.config[CONFIG_MODEL_EXTRA_FIELDS]:
+                    for entry in self.config[CONFIG_MODEL_MAPPING]:
+                        if entry['name'] == field:
+                            if kind == 'constant':
+                                entry['constant'] = value[0]
+                            elif kind == 'normalize':
+                                entry['normalizationTarget'] = True
+                                normalizationColumnType = entry['columnType']
+                            schema['extraFields'].append(entry)
+                            break
+
+            if self.config[CONFIG_MODEL_MAPPING]:
+                for field in schema['fields']:
+                    for entry in self.config[CONFIG_MODEL_MAPPING]:
+                        if entry['name'] == field['name']:
+                            field.update(entry)
+                            break
+                    if 'normalize' in field:
+                        columnType = normalizationColumnType
+                    else:
+                        columnType = field.get('columnType')
+                    if columnType is not None:
+                        for entry in columnTypes:
+                            if columnType == entry['name']:
+                                if 'dataType' in entry:
+                                    field['type'] = entry['dataType']
+                                field.update(entry.get('options', {}))
+                                break
+                    field.update(field.pop('options', {}))
+
+            # Our own additions
+            descriptor['taxonomyId'] = self.config[CONFIG_TAXONOMY_ID]
+
+            yield package.pkg
+            yield from package
+
+        return func
+
     def flow(self):
         if len(self.errors) == 0:
             primaryKey = [self.ct_to_fn(f) for f in self.config.get(CONFIG_PRIMARY_KEY)]
@@ -68,6 +128,7 @@ class TransformDGP(BaseDataGenusProcessor):
                 if ct is not None:
                     fieldOptions[ct] = dataTypes.get(ct, {})
             steps = [
+                self.create_fdp(),
                 add_computed_field([
                     dict(
                         operation='constant',
