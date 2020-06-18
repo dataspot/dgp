@@ -12,3 +12,4 @@ class FileFormatAnalyzer(BaseAnalyzer):
         stream = self.context.stream
         if stream is not None:
             self.config[CONFIG_FORMAT] = stream.format
+            self.config[CONFIG_DEDUPLICATE_HEADERS] = True
