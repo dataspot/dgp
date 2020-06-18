@@ -1,5 +1,5 @@
 from .....core import BaseAnalyzer, Validator, Required
-from .....config.consts import CONFIG_FORMAT, CONFIG_URL
+from .....config.consts import CONFIG_FORMAT, CONFIG_URL, CONFIG_DEDUPLICATE_HEADERS
 
 
 class FileFormatAnalyzer(BaseAnalyzer):
