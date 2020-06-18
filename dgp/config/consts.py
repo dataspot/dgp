@@ -8,6 +8,8 @@ CONFIG_HEADERS = 'source.headers'
 CONFIG_SHEET = 'source.sheet'
 CONFIG_SHEET_NAMES = 'source.sheet_names'
 CONFIG_FORCE_STRINGS = 'source.force_strings'
+CONFIG_WORKBOOK_CACHE = 'source.workbook_cache'
+CONFIG_DEDUPLICATE_HEADERS = 'source.deduplicate_headers'
 CONFIG_JSON_PROPERTY = 'source.property'
 
 CONFIG_SKIP_ROWS = 'structure.skip_rows'

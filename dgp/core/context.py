@@ -7,6 +7,9 @@ from ..config.consts import CONFIG_SKIP_ROWS, CONFIG_TAXONOMY_ID, CONFIG_FORMAT
 from ..taxonomies import TaxonomyRegistry, Taxonomy
 
 
+_workbook_cache = {}
+
+
 def trimmer(extended_rows):
     for row_number, headers, row in extended_rows:
         if headers:
@@ -46,6 +49,8 @@ class Context():
                 if not path:
                     return None
                 logger.info('Opening stream %s', path)
+                if 'workbook_cache' in source:
+                    source['workbook_cache'] = _workbook_cache
                 self._stream = tabulator.Stream(path, **source, **structure).open()
                 for k in source.keys():
                     self.config.get('source.' + k)

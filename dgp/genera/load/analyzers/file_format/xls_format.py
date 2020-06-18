@@ -1,5 +1,6 @@
 from .....core import BaseAnalyzer, Validator, Required
-from .....config.consts import CONFIG_FORMAT, CONFIG_SHEET, CONFIG_FORCE_STRINGS, CONFIG_SHEET_NAMES
+from .....config.consts import CONFIG_FORMAT, CONFIG_SHEET, CONFIG_FORCE_STRINGS,\
+    CONFIG_SHEET_NAMES, CONFIG_WORKBOOK_CACHE
 
 
 class XLSFormatAnalyzer(BaseAnalyzer):
@@ -11,6 +12,7 @@ class XLSFormatAnalyzer(BaseAnalyzer):
     def run(self):
         if self.config[CONFIG_FORMAT] == 'xls':
             self.config[CONFIG_FORCE_STRINGS] = True
+            self.config[CONFIG_WORKBOOK_CACHE] = {}
             self.config[CONFIG_SHEET_NAMES] = [
                 (i+1, name)
                 for i, name in
@@ -18,6 +20,7 @@ class XLSFormatAnalyzer(BaseAnalyzer):
             ]
         elif self.config[CONFIG_FORMAT] == 'xlsx':
             self.config[CONFIG_FORCE_STRINGS] = True
+            self.config[CONFIG_WORKBOOK_CACHE] = {}
             self.config[CONFIG_SHEET_NAMES] = [
                 (i, name)
                 for i, name in
