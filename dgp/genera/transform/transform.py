@@ -95,7 +95,7 @@ class TransformDGP(BaseDataGenusProcessor):
                                     field['type'] = entry['dataType']
                                 field.update(entry.get('options', {}))
                                 break
-                    field.update(field.pop('options', {}))
+                    field.update(field.get('options', {}))
 
             # Our own additions
             descriptor['taxonomyId'] = self.config[CONFIG_TAXONOMY_ID]
@@ -127,6 +127,7 @@ class TransformDGP(BaseDataGenusProcessor):
                 ct = mf.get('columnType')
                 if ct is not None:
                     fieldOptions[ct] = dataTypes.get(ct, {})
+                    fieldOptions[ct].update(mf.get('options', {}))
             steps = [
                 self.create_fdp(),
                 add_computed_field([
