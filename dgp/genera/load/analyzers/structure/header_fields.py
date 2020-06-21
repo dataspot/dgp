@@ -1,3 +1,5 @@
+from dataflows import load
+
 from .....core import BaseAnalyzer, Validator, Required
 from .....config.consts import CONFIG_SKIP_ROWS, CONFIG_SKIP_COLS, CONFIG_HEADER_FIELDS
 
@@ -14,6 +16,6 @@ class HeaderFieldsAnalyzer(BaseAnalyzer):
         stream = self.context.stream
         if stream is not None:
             if stream.headers is not None:
-                self.config[CONFIG_HEADER_FIELDS] = stream.headers
+                self.config[CONFIG_HEADER_FIELDS] = load.rename_duplicate_headers(stream.headers)
             else:
                 self.config[CONFIG_HEADER_FIELDS] = []

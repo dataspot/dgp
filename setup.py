@@ -21,7 +21,7 @@ def read(*paths):
 PACKAGE = 'dgp'
 NAME = PACKAGE.replace('_', '-')
 INSTALL_REQUIRES = [
-    'dataflows>=0.0.50',
+    'dataflows>=0.1.2',
     'PyYAML',
 ]
 LINT_REQUIRES = [
