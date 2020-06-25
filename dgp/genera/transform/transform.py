@@ -1,5 +1,5 @@
 from dataflows import Flow, concatenate, add_computed_field, \
-    unpivot, set_primary_key, PackageWrapper, set_type
+    unpivot, set_primary_key, PackageWrapper, set_type, validate
 from dataflows.base.schema_validator import ignore
 
 from ...core import BaseDataGenusProcessor
@@ -133,6 +133,7 @@ class TransformDGP(BaseDataGenusProcessor):
                     fieldOptions[ct].update(mf.get('options', {}))
             steps = [
                 self.create_fdp(),
+                validate(on_error=ignore),
                 add_computed_field([
                     dict(
                         operation='constant',
