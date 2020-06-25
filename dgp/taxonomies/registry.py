@@ -44,6 +44,9 @@ class Taxonomy():
         self.processing = ExtensionModule(processing_module)
         self.publishing = ExtensionModule(publishing_module)
         self.config = config
+        self.missingValues = self.config.get('missingValues', []) if self.config else []
+        if '' not in self.missingValues:
+            self.missingValues.append('')
 
         ct_names = []
         specs = {}

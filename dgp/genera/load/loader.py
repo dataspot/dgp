@@ -11,6 +11,7 @@ from .analyzers import FileFormatDGP, StructureDGP
 from ...config.consts import CONFIG_URL, CONFIG_PUBLISH_ALLOWED, RESOURCE_NAME
 from ...config.log import logger
 
+
 class LoaderDGP(BaseDataGenusProcessor):
 
     PRE_CHECKS = Validator(

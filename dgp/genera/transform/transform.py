@@ -6,7 +6,7 @@ from ...core import BaseDataGenusProcessor
 from .analyzers import TaxonomiesDGP, MappingDGP
 from ...config.consts import CONFIG_MODEL_EXTRA_FIELDS, CONFIG_MODEL_MAPPING,\
             CONFIG_TAXONOMY_CT, CONFIG_CONSTANTS, RESOURCE_NAME,\
-            CONFIG_PRIMARY_KEY, CONFIG_TAXONOMY_ID
+            CONFIG_PRIMARY_KEY, CONFIG_TAXONOMY_ID, CONFIG_TAXONOMY_MISSING_VALUES
 
 
 class TransformDGP(BaseDataGenusProcessor):
@@ -96,6 +96,9 @@ class TransformDGP(BaseDataGenusProcessor):
                                 field.update(entry.get('options', {}))
                                 break
                     field.update(field.get('options', {}))
+
+            # Missing Values
+            schema['missingValues'] = self.config[CONFIG_TAXONOMY_MISSING_VALUES]
 
             # Our own additions
             descriptor['taxonomyId'] = self.config[CONFIG_TAXONOMY_ID]

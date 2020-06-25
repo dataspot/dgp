@@ -21,6 +21,7 @@ CONFIG_TAXONOMY_LIST = 'taxonomy.options'
 CONFIG_TAXONOMY_ID = 'taxonomy.id'
 CONFIG_TAXONOMY_CT = 'taxonomy.columnTypes'
 CONFIG_TAXONOMY_SETTINGS = 'taxonomy.settings'
+CONFIG_TAXONOMY_MISSING_VALUES = 'taxonomy.missingValues'
 
 CONFIG_CONSTANTS = 'constants'
 
