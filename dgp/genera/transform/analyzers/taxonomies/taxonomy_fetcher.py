@@ -15,7 +15,8 @@ class TaxonomyFetcherAnalyzer(BaseAnalyzer):
         t: Taxonomy = self.context.taxonomies.get(tid)
         self.config[CONFIG_TAXONOMY_CT] = t.column_types
         self.config[CONFIG_TAXONOMY_SETTINGS] = t.config
-        self.config[CONFIG_TAXONOMY_MISSING_VALUES] = t.missingValues
+        if self.config[CONFIG_TAXONOMY_MISSING_VALUES] is None:
+            self.config[CONFIG_TAXONOMY_MISSING_VALUES] = t.missingValues
 
     def analyze(self):
         if self.test():
