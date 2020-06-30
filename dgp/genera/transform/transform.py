@@ -205,17 +205,17 @@ class TransformDGP(BaseDataGenusProcessor):
                         path='out.csv',
                     ), resources=RESOURCE_NAME
                 ),
-                *[
-                    set_type(
-                        self.ct_to_fn(f['columnType']),
-                        columnType=f['columnType'],
-                        **fieldOptions.get(f['columnType'], {}),
-                        resources=RESOURCE_NAME,
-                        on_error=ignore
-                    )
-                    for f in self.config.get(CONFIG_MODEL_MAPPING)
-                    if f.get('columnType') is not None
-                ],
+                # *[
+                #     set_type(
+                #         self.ct_to_fn(f['columnType']),
+                #         columnType=f['columnType'],
+                #         **fieldOptions.get(f['columnType'], {}),
+                #         resources=RESOURCE_NAME,
+                #         on_error=ignore
+                #     )
+                #     for f in self.config.get(CONFIG_MODEL_MAPPING)
+                #     if f.get('columnType') is not None
+                # ],
                 set_primary_key(primaryKey, resources=RESOURCE_NAME)
                 # printer()
             ]
