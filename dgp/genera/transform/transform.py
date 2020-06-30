@@ -1,3 +1,5 @@
+from dateutil.parser import parse as dateutil_parse
+
 from dataflows import Flow, concatenate, add_computed_field, \
     unpivot, set_primary_key, PackageWrapper, set_type, validate
 from dataflows.base.schema_validator import ignore
@@ -108,6 +110,40 @@ class TransformDGP(BaseDataGenusProcessor):
 
         return func
 
+    def datetime_handler(self):
+        auto_transforms = dict(
+            auto=dict(ignoretz=True, dayfirst=True, yearfirst=False),
+            auto_ymd=dict(ignoretz=True, dayfirst=False, yearfirst=True),
+            auto_ydm=dict(ignoretz=True, dayfirst=True, yearfirst=True),
+            auto_dmy=dict(ignoretz=True, dayfirst=True, yearfirst=False),
+            auto_mdy=dict(ignoretz=True, dayfirst=False, yearfirst=False),
+        )
+
+        def func(package: PackageWrapper):
+            parsers = []
+            for resource in package.pkg.descriptor['resources']:
+                if resource['name'] != RESOURCE_NAME:
+                    continue
+                for field in resource['schema']['fields']:
+                    if field['type'] == 'datetime':
+                        if field['format'] in auto_transforms:
+                            parsers.append((field['name'], auto_transforms[field['format']]))
+                            field['format'] = 'default'
+            yield package.pkg
+            for res in package:
+                if res.res.name != RESOURCE_NAME or len(parsers) == 0:
+                    yield from res
+                else:
+                    for row in res:
+                        for name, parser_info in parsers:
+                            if row.get(name):
+                                try:
+                                    row[name] = dateutil_parse(row[name], **parser_info)
+                                except ValueError:
+                                    pass
+                        yield row
+        return func
+
     def flow(self):
         if len(self.errors) == 0:
             primaryKey = [self.ct_to_fn(f) for f in self.config.get(CONFIG_PRIMARY_KEY)]
@@ -133,6 +169,7 @@ class TransformDGP(BaseDataGenusProcessor):
                     fieldOptions[ct].update(mf.get('options', {}))
             steps = [
                 self.create_fdp(),
+                self.datetime_handler(),
                 validate(on_error=ignore),
                 add_computed_field([
                     dict(
