@@ -120,10 +120,13 @@ class TransformDGP(BaseDataGenusProcessor):
         )
 
         def process_row(row, parsers):
-            for name, parser_info in parsers:
+            for name, parser_info, _type in parsers:
                 if row.get(name):
                     try:
-                        row[name] = dateutil_parse(row[name], **parser_info)
+                        val = dateutil_parse(row[name], **parser_info)
+                        if _type == 'date':
+                            val = val.date()
+                        row[name] = val.isoformat()
                     except ValueError:
                         pass
             return row
@@ -136,7 +139,7 @@ class TransformDGP(BaseDataGenusProcessor):
                 for field in resource['schema']['fields']:
                     if field['type'] in ('datetime', 'date'):
                         if field['format'] in auto_transforms:
-                            parsers.append((field['name'], auto_transforms[field['format']]))
+                            parsers.append((field['name'], auto_transforms[field['format']], field['type']))
                             field['format'] = 'default'
             yield package.pkg
             for res in package:
