@@ -134,14 +134,14 @@ class TransformDGP(BaseDataGenusProcessor):
                 if resource['name'] != RESOURCE_NAME:
                     continue
                 for field in resource['schema']['fields']:
-                    if field['type'] == 'datetime':
+                    if field['type'] in ('datetime', 'date'):
                         if field['format'] in auto_transforms:
                             parsers.append((field['name'], auto_transforms[field['format']]))
                             field['format'] = 'default'
             yield package.pkg
             for res in package:
                 if res.res.name != RESOURCE_NAME or len(parsers) == 0:
-                    yield from res
+                    yield res
                 else:
                     yield (process_row(row, parsers) for row in res)
         return func
