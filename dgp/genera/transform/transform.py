@@ -119,6 +119,15 @@ class TransformDGP(BaseDataGenusProcessor):
             auto_mdy=dict(ignoretz=True, dayfirst=False, yearfirst=False),
         )
 
+        def process_row(row, parsers):
+            for name, parser_info in parsers:
+                if row.get(name):
+                    try:
+                        row[name] = dateutil_parse(row[name], **parser_info)
+                    except ValueError:
+                        pass
+            return row
+
         def func(package: PackageWrapper):
             parsers = []
             for resource in package.pkg.descriptor['resources']:
@@ -134,14 +143,7 @@ class TransformDGP(BaseDataGenusProcessor):
                 if res.res.name != RESOURCE_NAME or len(parsers) == 0:
                     yield from res
                 else:
-                    for row in res:
-                        for name, parser_info in parsers:
-                            if row.get(name):
-                                try:
-                                    row[name] = dateutil_parse(row[name], **parser_info)
-                                except ValueError:
-                                    pass
-                        yield row
+                    yield (process_row(row, parsers) for row in res)
         return func
 
     def flow(self):
