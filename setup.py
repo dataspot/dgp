@@ -22,7 +22,7 @@ PACKAGE = 'dgp'
 NAME = PACKAGE.replace('_', '-')
 INSTALL_REQUIRES = [
     'dataflows>=0.1.2',
-    'dateutil',
+    'python-dateutil',
     'PyYAML',
 ]
 LINT_REQUIRES = [
