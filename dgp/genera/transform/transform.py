@@ -1,6 +1,7 @@
 from dateutil.parser import parse as dateutil_parse
+from copy import deepcopy
 
-from dataflows import Flow, concatenate, add_computed_field, \
+from dataflows import Flow, concatenate, add_computed_field, update_resource, \
     unpivot, set_primary_key, PackageWrapper, set_type, validate
 from dataflows.base.schema_validator import ignore
 
@@ -149,6 +150,39 @@ class TransformDGP(BaseDataGenusProcessor):
                     yield (process_row(row, parsers) for row in res)
         return func
 
+    def rename(self, dst_src_tuples):
+
+        tuples = dst_src_tuples
+
+        def func(package: PackageWrapper):
+
+            def renamer(row, _tuples):
+                return dict(
+                    (dst, row.get(src)) for dst, src in _tuples
+                )
+
+            for resource in package.pkg.descriptor['resources']:
+                if resource['name'] == RESOURCE_NAME:
+                    new_fields = []
+                    new_tuples = []
+                    for f in resource['schema']['fields']:
+                        for dst, src in tuples:
+                            if src == f['name']:
+                                f = deepcopy(f)
+                                f['name'] = dst
+                                new_tuples.append((dst, src))
+                                new_fields.append(f)
+                    resource['schema']['fields'] = new_fields
+
+            yield package.pkg
+            for res in package:
+                if res.res.name != RESOURCE_NAME:
+                    yield res
+                else:
+                    yield (renamer(row, new_tuples) for row in res)
+
+        return func
+
     def flow(self):
         if len(self.errors) == 0:
             primaryKey = [self.ct_to_fn(f) for f in self.config.get(CONFIG_PRIMARY_KEY)]
@@ -198,15 +232,13 @@ class TransformDGP(BaseDataGenusProcessor):
                 ),
             ] if normalizeFieldDef else []) + [
                 self.copy_names_to_titles(),
-                concatenate(
-                    dict(
-                        (self.ct_to_fn(f['columnType']), [f['name']])
-                        for f in self.config.get(CONFIG_MODEL_MAPPING)
-                        if f.get('columnType') is not None
-                    ), dict(
-                        name=RESOURCE_NAME,
-                        path='out.csv',
-                    ), resources=RESOURCE_NAME
+                self.rename([
+                    (self.ct_to_fn(f['columnType']), f['name'])
+                    for f in self.config.get(CONFIG_MODEL_MAPPING)
+                    if f.get('columnType') is not None
+                ]),
+                update_resource(
+                    RESOURCE_NAME, path='out.csv'
                 ),
                 # *[
                 #     set_type(
