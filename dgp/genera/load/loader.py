@@ -70,3 +70,11 @@ class LoaderDGP(BaseDataGenusProcessor):
                 return Flow(
                     load(datapackage_path, resources=RESOURCE_NAME),
                 )
+
+
+
+class PostLoaderDGP(ConfigurableDGP):
+
+    def init(self):
+        super().init('loading')
+        self._flows = None

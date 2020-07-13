@@ -1,7 +1,7 @@
 from dataflows import Flow
 
 from ..core import BaseDataGenusProcessor
-from .load import LoaderDGP
+from .load import LoaderDGP, PostLoaderDGP
 from .transform import TransformDGP
 from .enrich import EnricherDGP
 
@@ -11,6 +11,7 @@ class SimpleDGP(BaseDataGenusProcessor):
     def init(self,
              steps=[
                  LoaderDGP,
+                 PostLoaderDGP,
                  TransformDGP,
                  EnricherDGP,
              ]):
