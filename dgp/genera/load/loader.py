@@ -6,7 +6,7 @@ from hashlib import md5
 from dataflows import Flow, load, dump_to_path
 from dataflows.base.schema_validator import ignore
 
-from ...core import BaseDataGenusProcessor, Required, Validator
+from ...core import BaseDataGenusProcessor, Required, Validator, ConfigurableDGP
 from .analyzers import FileFormatDGP, StructureDGP
 from ...config.consts import CONFIG_URL, CONFIG_PUBLISH_ALLOWED, RESOURCE_NAME
 from ...config.log import logger
@@ -70,7 +70,6 @@ class LoaderDGP(BaseDataGenusProcessor):
                 return Flow(
                     load(datapackage_path, resources=RESOURCE_NAME),
                 )
-
 
 
 class PostLoaderDGP(ConfigurableDGP):
