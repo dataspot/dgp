@@ -1,4 +1,4 @@
-from .load import LoaderDGP
+from .load import LoaderDGP, PostLoaderDGP
 from .transform import TransformDGP
 from .enrich import EnricherDGP
 from .publish import PublisherDGP
