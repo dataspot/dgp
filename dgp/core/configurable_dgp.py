@@ -26,7 +26,7 @@ class ConfigurableDGP(BaseDataGenusProcessor):
     @property
     def analyzers(self):
         if self._analyzers is None:
-            self._analyzers = self.module.analyzers
+            self._analyzers = self.module.analyzers(self.config, self.context)
             self.steps = self.init_classes(self._analyzers)
         return self._analyzers
 
