@@ -5,14 +5,14 @@ class ConfigurableDGP(BaseDataGenusProcessor):
 
     def init(self, kind):
         self._flows = None
+        self._analyzers = None
         self._kind = kind
 
     def analyze(self):
         if not self.steps:
             if self.context.taxonomy:
-                analyzers = self.module.analyzers(self.config, self.context)
-                if analyzers is not None:
-                    self.steps = self.init_classes(analyzers)
+                if self.analyzers is not None:
+                    self.steps = self.init_classes(self.analyzers)
         return super().analyze()
 
     @property
@@ -25,6 +25,12 @@ class ConfigurableDGP(BaseDataGenusProcessor):
             self._flows = self.module.flows(self.config, self.context)
         return self._flows
 
+    @property
+    def analyzers(self):
+        if self._analyzers is None:
+            self._analyzers = self.module.analyzers(self.config, self.context)
+        return self._analyzers
+
     def preflow(self):
         if self.flows:
             return self.flows[0]
@@ -35,6 +41,8 @@ class ConfigurableDGP(BaseDataGenusProcessor):
             return Flow(
                 self.flows[1],
             )
+        elif self.analyzers:
+            return super().flow()
         else:
             return Flow(
             )
