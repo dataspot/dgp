@@ -2,7 +2,7 @@ from dateutil.parser import parse as dateutil_parse
 from copy import deepcopy
 
 from dataflows import Flow, concatenate, add_computed_field, update_resource, \
-    unpivot, set_primary_key, PackageWrapper, set_type, validate
+    unpivot, set_primary_key, PackageWrapper, set_type, validate, ResourceWrapper
 from dataflows.base.schema_validator import ignore
 
 from ...core import BaseDataGenusProcessor
@@ -183,6 +183,23 @@ class TransformDGP(BaseDataGenusProcessor):
 
         return func
 
+    def set_consts(self):
+        update = dict(
+            (mf['name'], mf['constant'])
+            for mf in self.config[CONFIG_MODEL_MAPPING]
+            if 'constant' in mf
+        )
+
+        def func(rows: ResourceWrapper):
+            if rows.res.name == RESOURCE_NAME:
+                for row in rows:
+                    row.update(update)
+                    yield row
+            else:
+                yield from rows
+
+        return func
+
     def flow(self):
         if len(self.errors) == 0:
             primaryKey = [self.ct_to_fn(f) for f in self.config.get(CONFIG_PRIMARY_KEY)]
@@ -209,15 +226,8 @@ class TransformDGP(BaseDataGenusProcessor):
             steps = [
                 self.create_fdp(),
                 self.datetime_handler(),
+                self.set_consts(),
                 validate(on_error=ignore),
-                add_computed_field([
-                    dict(
-                        operation='constant',
-                        target=k,
-                        with_=v
-                    )
-                    for k, v in self.config.get(CONFIG_CONSTANTS)
-                ], resources=RESOURCE_NAME),
             ] + ([
                 unpivot(
                     [
