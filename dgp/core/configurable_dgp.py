@@ -9,11 +9,9 @@ class ConfigurableDGP(BaseDataGenusProcessor):
         self._kind = kind
 
     def analyze(self):
-        if not self.steps:
-            if self.context.taxonomy:
-                if self.analyzers is not None:
-                    self.steps = self.init_classes(self.analyzers)
-        return super().analyze()
+        if self.analyzers is not None:
+            return super().analyze()
+        return True
 
     @property
     def module(self):
@@ -28,7 +26,8 @@ class ConfigurableDGP(BaseDataGenusProcessor):
     @property
     def analyzers(self):
         if self._analyzers is None:
-            self._analyzers = self.module.analyzers(self.config, self.context)
+            self._analyzers = self.module.analyzers
+            self.steps = self.init_classes(self._analyzers)
         return self._analyzers
 
     def preflow(self):
