@@ -1,7 +1,7 @@
 from dateutil.parser import parse as dateutil_parse
 from copy import deepcopy
 
-from dataflows import Flow, concatenate, add_computed_field, update_resource, \
+from dataflows import Flow, concatenate, add_field, update_resource, \
     unpivot, set_primary_key, PackageWrapper, set_type, validate, ResourceWrapper
 from dataflows.base.schema_validator import ignore
 
@@ -20,21 +20,19 @@ class TransformDGP(BaseDataGenusProcessor):
             MappingDGP
         ])
 
-    def join_mapping_taxonomy(self, kind):
+    def join_mapping_taxonomy(self, kind, fieldOptions):
         field_names = [
             f[1]
             for f in self.config.get(CONFIG_MODEL_EXTRA_FIELDS)
             if f[0] == kind
         ]
         field_defs = [
-            m
-            for m in self.config.get(CONFIG_MODEL_MAPPING)
-            if m['name'] in field_names
+            dict(
+                name=name,
+                **fieldOptions[name]
+            ) 
+            for name in field_names
         ]
-        for f in field_defs:
-            for t in self.config.get(CONFIG_TAXONOMY_CT):
-                if f['columnType'] == t['name']:
-                    f['type'] = t['dataType']
 
         return field_defs
 
@@ -183,32 +181,27 @@ class TransformDGP(BaseDataGenusProcessor):
 
         return func
 
-    def set_consts(self):
-        update = dict(
-            (mf['name'], mf['constant'])
-            for mf in self.config[CONFIG_MODEL_MAPPING]
-            if 'constant' in mf
-        )
+    def set_consts(self, fieldOptions):
 
-        def func(rows: ResourceWrapper):
-            if rows.res.name == RESOURCE_NAME:
-                for row in rows:
-                    row.update(update)
-                    yield row
-            else:
-                yield from rows
-
-        return func
+        steps = []
+        for mf in self.config.get(CONFIG_MODEL_MAPPING):
+            if 'constant' in mf:
+                name = mf['name']
+                options = fieldOptions.get(name)
+                if options:
+                    type_ = options.pop('type')
+                    default = mf['constant']
+                    steps.append(add_field(
+                        name, type_, default,
+                        resources=RESOURCE_NAME,
+                        **options
+                    ))
+        return Flow(*steps)
 
     def flow(self):
         if len(self.errors) == 0:
             primaryKey = [self.ct_to_fn(f) for f in self.config.get(CONFIG_PRIMARY_KEY)]
-            extraFieldDefs = self.join_mapping_taxonomy('extra')
-            normalizeFieldDef = self.join_mapping_taxonomy('normalize')
-            if len(normalizeFieldDef) > 0:
-                normalizeFieldDef = normalizeFieldDef[0]
-            else:
-                normalizeFieldDef = None
+
             fieldOptions = {}
             dataTypes = dict(
                 (ct['name'], dict(
@@ -220,13 +213,24 @@ class TransformDGP(BaseDataGenusProcessor):
             )
             for mf in self.config.get(CONFIG_MODEL_MAPPING):
                 ct = mf.get('columnType')
+                name = mf['name']
+                fieldOptions[name] = {}
                 if ct is not None:
-                    fieldOptions[ct] = dataTypes.get(ct, {})
-                    fieldOptions[ct].update(mf.get('options', {}))
+                    fieldOptions[name].update(dataTypes.get(ct, {}))
+                fieldOptions[name].update(mf.get('options', {}))
+                fieldOptions[ct]['columnType'] = ct
+
+            extraFieldDefs = self.join_mapping_taxonomy('extra', fieldOptions)
+            normalizeFieldDef = self.join_mapping_taxonomy('normalize', fieldOptions)
+            if len(normalizeFieldDef) > 0:
+                normalizeFieldDef = normalizeFieldDef[0]
+            else:
+                normalizeFieldDef = None
+
             steps = [
                 self.create_fdp(),
                 self.datetime_handler(),
-                self.set_consts(),
+                self.set_consts(fieldOptions),
                 validate(on_error=ignore),
             ] + ([
                 unpivot(
