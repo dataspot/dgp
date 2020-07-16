@@ -218,7 +218,7 @@ class TransformDGP(BaseDataGenusProcessor):
                 if ct is not None:
                     fieldOptions[name].update(dataTypes.get(ct, {}))
                 fieldOptions[name].update(mf.get('options', {}))
-                fieldOptions[ct]['columnType'] = ct
+                fieldOptions[name]['columnType'] = ct
 
             extraFieldDefs = self.join_mapping_taxonomy('extra', fieldOptions)
             normalizeFieldDef = self.join_mapping_taxonomy('normalize', fieldOptions)
