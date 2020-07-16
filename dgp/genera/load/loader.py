@@ -75,5 +75,5 @@ class LoaderDGP(BaseDataGenusProcessor):
 class PostLoaderDGP(ConfigurableDGP):
 
     def init(self):
-        super().init('loading')
+        super().init('loading', per_taxonomy=False)
         self._flows = None
