@@ -184,13 +184,12 @@ class TransformDGP(BaseDataGenusProcessor):
     def set_consts(self, fieldOptions):
 
         steps = []
-        for mf in self.config.get(CONFIG_MODEL_MAPPING):
-            if 'constant' in mf:
-                name = mf['name']
+        for kind, name, *value in self.config[CONFIG_MODEL_EXTRA_FIELDS]:
+            if kind == 'constant':
+                default = value[0]
                 options = fieldOptions.get(name)
                 if options:
                     type_ = options.pop('type')
-                    default = mf['constant']
                     steps.append(add_field(
                         name, type_, default,
                         resources=RESOURCE_NAME,
