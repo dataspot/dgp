@@ -11,4 +11,5 @@ class TaxonomyListAnalyzer(BaseAnalyzer):
                 title=t.title
             )
             for t in self.context.taxonomies
+            if t.id != '_common_'
         ]
