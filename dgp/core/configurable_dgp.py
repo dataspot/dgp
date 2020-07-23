@@ -17,9 +17,9 @@ class ConfigurableDGP(BaseDataGenusProcessor):
     @property
     def module(self):
         if self._per_taxonomy:
-            return getattr(self.context.taxonomy, self._kind)
-        else:
-            return getattr(self.context.taxonomies.get('_common_'), self._kind)
+            if hasattr(self.context.taxonomy, self._kind):
+                return getattr(self.context.taxonomy, self._kind)
+        return getattr(self.context.taxonomies.get('_common_'), self._kind)
 
     @property
     def flows(self):
