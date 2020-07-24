@@ -82,7 +82,8 @@ class TaxonomyRegistry():
         for k, v in index.items():
             id = k
 
-            args = [v['title']]
+            title = v.get('title', k)
+            args = [title]
             for (key, loader) in [
                     ('column_types', json.load),
                     ('header_mapping', yaml.load),
