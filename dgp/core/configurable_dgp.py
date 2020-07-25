@@ -17,8 +17,9 @@ class ConfigurableDGP(BaseDataGenusProcessor):
     @property
     def module(self):
         if self._per_taxonomy:
-            if hasattr(self.context.taxonomy, self._kind):
-                return getattr(self.context.taxonomy, self._kind)
+            ret = getattr(self.context.taxonomy, self._kind)
+            if ret and ret.module:
+                return ret
         return getattr(self.context.taxonomies.get('_common_'), self._kind)
 
     @property
