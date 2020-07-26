@@ -23,13 +23,16 @@ class ExtensionModule():
     def __init__(self, module):
         self.module = module
 
+    def has_module(self):
+        return not isinstance(self.module, dict)
+
     def analyzers(self, config, context):
-        if self.module:
+        if self.has_module():
             if hasattr(self.module, 'analyzers'):
                 return self.module.analyzers(config, context)
 
     def flows(self, config, context):
-        if self.module:
+        if self.has_module():
             if hasattr(self.module, 'flows'):
                 return self.module.flows(config, context)
 
