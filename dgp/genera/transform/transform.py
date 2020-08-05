@@ -6,6 +6,7 @@ from dataflows import Flow, concatenate, add_field, update_resource, \
 from dataflows.base.schema_validator import ignore
 
 from ...core import BaseDataGenusProcessor
+from ...config.log import logger
 from .analyzers import TaxonomiesDGP, MappingDGP
 from ...config.consts import CONFIG_MODEL_EXTRA_FIELDS, CONFIG_MODEL_MAPPING,\
             CONFIG_TAXONOMY_CT, CONFIG_CONSTANTS, RESOURCE_NAME,\
@@ -221,10 +222,20 @@ class TransformDGP(BaseDataGenusProcessor):
 
             extraFieldDefs = self.join_mapping_taxonomy('extra', fieldOptions)
             normalizeFieldDef = self.join_mapping_taxonomy('normalize', fieldOptions)
+            unpivotFields = [
+                dict(
+                    name=f['name'],
+                    keys=f['normalize'],
+                )
+                for f in self.config.get(CONFIG_MODEL_MAPPING)
+                if 'normalize' in f
+            ]
             if len(normalizeFieldDef) > 0:
                 normalizeFieldDef = normalizeFieldDef[0]
             else:
                 normalizeFieldDef = None
+
+            logger.error('UNPIVOT %r %r %r', unpivotFields, extraFieldDefs, normalizeFieldDef)
 
             steps = [
                 self.create_fdp(),
@@ -233,14 +244,7 @@ class TransformDGP(BaseDataGenusProcessor):
                 validate(on_error=ignore),
             ] + ([
                 unpivot(
-                    [
-                        dict(
-                            name=f['name'],
-                            keys=f['normalize'],
-                        )
-                        for f in self.config.get(CONFIG_MODEL_MAPPING)
-                        if 'normalize' in f
-                    ], extraFieldDefs, normalizeFieldDef,
+                    unpivotFields, extraFieldDefs, normalizeFieldDef,
                     resources=RESOURCE_NAME
                 ),
             ] if normalizeFieldDef else []) + [

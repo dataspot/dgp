@@ -85,11 +85,6 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
         if len(current_mapping) > 0:
             # Avoid re-guessing mapping after first round
             known = {}
-        # [
-        #     (kf, ct, normalize)
-        #     for kf, txn_id, ct, *normalize in known_fields()
-        #     if txn_id in (None, taxonomy_id)
-        # ]
         existing = dict(
             (entry.get('name'), entry)
             for entry in current_mapping

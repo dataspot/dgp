@@ -47,8 +47,9 @@ class MandatoryFieldsAnalyzer(BaseAnalyzer):
 
             self.errors.extend(
                 ConfigValidationError(
-                    Validator.INVALID,
-                    columnType
+                    Validator.MISSING,
+                    columnType['name'],
+                    description=columnType['title']
                 )
                 for columnType in mandatory
             )
