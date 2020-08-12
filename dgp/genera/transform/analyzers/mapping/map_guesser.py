@@ -16,6 +16,7 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
 
     def get_mapping(self, fields, known, existing, extraFields, cts):
         mapping = []
+        used_cts = set()
         for field in fields:
             if field is not None:
                 if field in existing:
@@ -24,6 +25,8 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
                     for kf, kv in known.items():
                         if field.lower() == kf.lower():
                             ct = kv.get('type')
+                            if ct in used_cts:
+                                continue
                             full_ct = cts.get(ct)
                             if full_ct is None:
                                 logger.info('Failed to find columnType entry for known mapping %s -> %s', kf, kv)
@@ -53,6 +56,7 @@ class MappingGuesserAnalyzer(BaseAnalyzer):
                                     options=full_ct.get('options') or {},
                                     columnType=ct
                                 )
+                                used_cts.add(ct)
                             mapping.append(field_mapping)
                             break
                     else:
