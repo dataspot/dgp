@@ -127,7 +127,7 @@ class TransformDGP(BaseDataGenusProcessor):
                         if _type == 'date':
                             val = val.date()
                         row[name] = val.isoformat()
-                    except ValueError:
+                    except ValueError, TypeError:
                         pass
             return row
 
