@@ -10,4 +10,5 @@ class JsonFormatAnalyzer(BaseAnalyzer):
 
     def run(self):
         if self.config[CONFIG_FORMAT] == 'json':
-            self.config[CONFIG_JSON_PROPERTY] = ''
+            self.config.setdefault(CONFIG_JSON_PROPERTY, None)
+            self.config[CONFIG_JSON_PROPERTY] = self.config[CONFIG_JSON_PROPERTY] or None
