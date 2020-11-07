@@ -245,6 +245,7 @@ class TransformDGP(BaseDataGenusProcessor):
             ] + ([
                 unpivot(
                     unpivotFields, extraFieldDefs, normalizeFieldDef,
+                    regex=False,
                     resources=RESOURCE_NAME
                 ),
             ] if normalizeFieldDef else []) + [
