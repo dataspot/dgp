@@ -37,15 +37,11 @@ class LoaderDGP(BaseDataGenusProcessor):
             cache_path = os.path.join('.cache', ref_hash)
             datapackage_path = os.path.join(cache_path, 'datapackage.json')
             structure_params = self.context._structure_params()
-            session = requests.Session()
-            session.headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' +
-                              ' (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'
-            }
+            http_session = self.context.http_session()
             loader = load(source.pop('path'), validate=False,
                           name=RESOURCE_NAME,
                           **source, **structure_params,
-                          http_session=session,
+                          http_session=http_session,
                           infer_strategy=load.INFER_PYTHON_TYPES,
                           cast_strategy=load.CAST_DO_NOTHING,
                           limit_rows=(

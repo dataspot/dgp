@@ -1,9 +1,10 @@
 import copy
 import tabulator
+import requests
 
 from .config import Config
 from ..config.log import logger
-from ..config.consts import CONFIG_SKIP_ROWS, CONFIG_TAXONOMY_ID, CONFIG_FORMAT
+from ..config.consts import CONFIG_SKIP_ROWS, CONFIG_TAXONOMY_ID, CONFIG_FORMAT, CONFIG_ALLOW_INSECURE_TLS
 from ..taxonomies import TaxonomyRegistry, Taxonomy
 
 
@@ -39,6 +40,13 @@ class Context():
     def reset_stream(self):
         self._stream = None
 
+    def http_session(self):
+        http_session = requests.Session()
+        http_session.headers.update(tabulator.config.HTTP_HEADERS)
+        if self.config.get(CONFIG_ALLOW_INSECURE_TLS):
+            http_session.verify = False
+        return http_session
+
     @property
     def stream(self):
         if self._stream is None:
@@ -51,7 +59,7 @@ class Context():
                 logger.info('Opening stream %s', path)
                 if 'workbook_cache' in source:
                     source['workbook_cache'] = _workbook_cache
-                self._stream = tabulator.Stream(path, **source, **structure).open()
+                self._stream = tabulator.Stream(path, **source, **structure, http_session=self.http_session()).open()
                 for k in source.keys():
                     self.config.get('source.' + k)
                 for k in structure.keys():

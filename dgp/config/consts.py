@@ -12,6 +12,7 @@ CONFIG_FORCE_STRINGS = 'source.force_strings'
 CONFIG_WORKBOOK_CACHE = 'source.workbook_cache'
 CONFIG_DEDUPLICATE_HEADERS = 'source.deduplicate_headers'
 CONFIG_JSON_PROPERTY = 'source.property'
+CONFIG_ALLOW_INSECURE_TLS = 'config.allow_insecure_tls'
 
 CONFIG_SKIP_ROWS = 'structure.skip_rows'
 CONFIG_SKIP_COLS = 'structure.skip_cols'
