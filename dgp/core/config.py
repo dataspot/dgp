@@ -11,7 +11,7 @@ class Config():
         self._config = {}
         if filename and os.path.exists(filename):
             with open(filename) as input:
-                self._config = self._flatten(yaml.load(input))
+                self._config = self._flatten(yaml.load(input, Loader=yaml.SafeLoader))
         self._validators = []
         self._dirty = True
         self._state_keys = set()

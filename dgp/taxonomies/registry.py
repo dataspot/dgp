@@ -18,6 +18,10 @@ def load_module(py_file):
     return loaded_module
 
 
+def safe_yaml_load(*args, **kw):
+    return yaml.load(*args, **kw, Loader=yaml.SafeLoader)
+
+
 class ExtensionModule():
 
     def __init__(self, module):
@@ -80,7 +84,7 @@ class TaxonomyRegistry():
     def _build_index(self, index_file):
         base_path = os.path.dirname(index_file)
         with open(index_file) as index:
-            index = yaml.load(index)
+            index = safe_yaml_load(index)
         ret = {}
         for k, v in index.items():
             id = k
@@ -89,7 +93,7 @@ class TaxonomyRegistry():
             args = [title]
             for (key, loader) in [
                     ('column_types', json.load),
-                    ('header_mapping', yaml.load),
+                    ('header_mapping', safe_yaml_load),
                     ('processing_module', load_module),
                     ('publishing_module', load_module),
                     ('loading_module', load_module),

@@ -235,8 +235,6 @@ class TransformDGP(BaseDataGenusProcessor):
             else:
                 normalizeFieldDef = None
 
-            logger.error('UNPIVOT %r %r %r', unpivotFields, extraFieldDefs, normalizeFieldDef)
-
             steps = [
                 self.create_fdp(),
                 self.datetime_handler(),
