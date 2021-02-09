@@ -6,12 +6,14 @@ import hashlib
 
 class Config():
 
-    def __init__(self, filename=None):
+    def __init__(self, filename=None, data=None):
         self.filename = filename
         self._config = {}
         if filename and os.path.exists(filename):
             with open(filename) as input:
                 self._config = self._flatten(yaml.load(input, Loader=yaml.SafeLoader))
+        if data is not None:
+            self._config = self._flatten(data)
         self._validators = []
         self._dirty = True
         self._state_keys = set()
