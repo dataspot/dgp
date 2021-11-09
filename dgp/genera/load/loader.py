@@ -42,6 +42,7 @@ class LoaderDGP(BaseDataGenusProcessor):
                           name=RESOURCE_NAME,
                           **source, **structure_params,
                           http_session=http_session,
+                          http_timeout=120,
                           infer_strategy=load.INFER_PYTHON_TYPES,
                           cast_strategy=load.CAST_DO_NOTHING,
                           limit_rows=(
