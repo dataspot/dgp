@@ -1,4 +1,5 @@
 from dateutil.parser import parse as dateutil_parse
+import datetime
 from copy import deepcopy
 
 from dataflows import Flow, concatenate, add_field, update_resource, \
@@ -117,13 +118,19 @@ class TransformDGP(BaseDataGenusProcessor):
             auto_ydm=dict(ignoretz=True, dayfirst=True, yearfirst=True),
             auto_dmy=dict(ignoretz=True, dayfirst=True, yearfirst=False),
             auto_mdy=dict(ignoretz=True, dayfirst=False, yearfirst=False),
+            excel=dict(excel=True)
         )
 
         def process_row(row, parsers):
             for name, parser_info, _type in parsers:
                 if row.get(name):
                     try:
-                        val = dateutil_parse(row[name], **parser_info)
+                        val = row[name]
+                        if parser_info.get('excel'):
+                            val = float(val)
+                            val = datetime.datetime(1900, 1, 1) + datetime.timedelta(val)
+                        else:
+                            val = dateutil_parse(row[name], **parser_info)
                         if _type == 'date':
                             val = val.date()
                         row[name] = val.isoformat()
