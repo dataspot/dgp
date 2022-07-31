@@ -3,7 +3,7 @@ import json
 import requests
 from hashlib import md5
 
-from dataflows import Flow, load, dump_to_path, stream, unstream
+from dataflows import Flow, load, dump_to_path, checkpoint
 from dataflows.base.schema_validator import ignore
 
 from ...core import BaseDataGenusProcessor, Required, Validator, ConfigurableDGP
@@ -56,18 +56,22 @@ class LoaderDGP(BaseDataGenusProcessor):
                     loader,
                 )
             else:
-                if not os.path.exists(cache_path):
-                    logger.info('Caching source data into %s', cache_path)
-                    Flow(
-                        loader,
-                        stream(cache_path),
-                        # printer(),
-                    ).process()
-                logger.info('Using cached source data from %s', cache_path)
                 return Flow(
-                    unstream(cache_path),
-                    # load(datapackage_path, resources=RESOURCE_NAME),
+                    loader,
+                    checkpoint(ref_hash),
                 )
+                # if not os.path.exists(cache_path):
+                #     logger.info('Caching source data into %s', cache_path)
+                #     Flow(
+                #         loader,
+                #         stream(cache_path),
+                #         # printer(),
+                #     ).process()
+                # logger.info('Using cached source data from %s', cache_path)
+                # return Flow(
+                #     unstream(cache_path),
+                #     # load(datapackage_path, resources=RESOURCE_NAME),
+                # )
 
 
 class PostLoaderDGP(ConfigurableDGP):
