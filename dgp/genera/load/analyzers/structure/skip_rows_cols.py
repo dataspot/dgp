@@ -16,33 +16,33 @@ class SkipRowsColsAnalyzer(BaseAnalyzer):
         self.config[CONFIG_SKIP_COLS] = 0
         sample = stream.sample
         max_score = None
+        max_location = None
 
-        def has_value(row, col):
-            try:
-                val = sample[row][col]
-                return val == 0 or bool(val)
-            except IndexError:
-                return False
+        def has_value(val):
+            return 1 if val == 0 or bool(val) else -1
 
-        def top(_idx):
-            return has_value(skip_row, skip_col + _idx)
-
-        def bottom(_idx):
-            return has_value(skip_row + 1, skip_col + _idx)
+        sample = [
+            [has_value(v) for v in r]
+            for r in sample
+        ]
 
         for skip_row in range(10):
             for skip_col in range(5):
-                idx = 0
-                score = 0
-                headers = 0
-                while top(idx) or bottom(idx):
-                    score += 1 if top(idx) and bottom(idx) else 0
-                    headers += 1 if top(idx) else 0
-                    idx += 1
-                score = (score, -skip_row, -skip_col, headers)
+                score = sum(
+                    sum(r[skip_col:])
+                    for r in sample[skip_row:]
+                )
                 if max_score is None or max_score < score:
                     max_score = score
+                    max_location = (skip_row, skip_col)
 
-        self.config[CONFIG_HEADER_COUNT] = max_score[3]
-        self.config[CONFIG_SKIP_ROWS] = -max_score[1]
-        self.config[CONFIG_SKIP_COLS] = -max_score[2]
+        header_count = 0
+        for v in sample[max_location[0]][max_location[1]:]:
+            if v == 1:
+                header_count += 1
+            else:
+                break
+
+        self.config[CONFIG_HEADER_COUNT] = header_count
+        self.config[CONFIG_SKIP_ROWS] = max_location[0]
+        self.config[CONFIG_SKIP_COLS] = max_location[1]
