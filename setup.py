@@ -21,7 +21,7 @@ def read(*paths):
 PACKAGE = 'dgp'
 NAME = PACKAGE.replace('_', '-')
 INSTALL_REQUIRES = [
-    'dataflows>=0.1.12',
+    'dataflows>=0.3.19',
     'python-dateutil',
     'PyYAML',
 ]

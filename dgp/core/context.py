@@ -2,6 +2,8 @@ import copy
 import tabulator
 import requests
 
+import dataflows as DF
+
 from .config import Config
 from ..config.log import logger
 from ..config.consts import CONFIG_SKIP_ROWS, CONFIG_TAXONOMY_ID, CONFIG_FORMAT, CONFIG_ALLOW_INSECURE_TLS
@@ -52,6 +54,7 @@ class Context():
         if self._stream is None:
             source = copy.deepcopy(self.config._unflatten().get('source', {}))
             structure = self._structure_params()
+            custom_parsers = DF.load.get_custom_parsers(source.get('custom_parsers'))
             try:
                 path = source.pop('path')
                 if not path:
@@ -59,7 +62,7 @@ class Context():
                 logger.info('Opening stream %s', path)
                 if 'workbook_cache' in source:
                     source['workbook_cache'] = _workbook_cache
-                self._stream = tabulator.Stream(path, **source, **structure, http_session=self.http_session()).open()
+                self._stream = tabulator.Stream(path, **source, **structure, **custom_parsers, http_session=self.http_session()).open()
                 for k in source.keys():
                     self.config.get('source.' + k)
                 for k in structure.keys():
