@@ -44,7 +44,7 @@ class ExtensionModule():
 class Taxonomy():
 
     def __init__(self, id, title, column_types, header_mapping,
-                 processing_module, publishing_module, loading_module,
+                 processing_module, publishing_module, loading_module, preloading_module,
                  config):
         self.id = id
         self.title = title
@@ -52,6 +52,7 @@ class Taxonomy():
         self.processing = ExtensionModule(processing_module)
         self.publishing = ExtensionModule(publishing_module)
         self.loading = ExtensionModule(loading_module)
+        self.preloading = ExtensionModule(preloading_module)
         self.config = config
         self.missingValues = self.config.get('missingValues', []) if self.config else []
         if '' not in self.missingValues:
@@ -97,6 +98,7 @@ class TaxonomyRegistry():
                     ('processing_module', load_module),
                     ('publishing_module', load_module),
                     ('loading_module', load_module),
+                    ('preloading_module', load_module),
                     ('config', None),
                     ]:
                 value = v.get(key)

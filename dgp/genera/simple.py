@@ -2,7 +2,7 @@ from dataflows import Flow
 
 from ..core import BaseDataGenusProcessor
 from ..config.log import logger
-from .load import LoaderDGP, PostLoaderDGP
+from .load import LoaderDGP, PostLoaderDGP, PreLoaderDGP
 from .transform import TransformDGP
 from .enrich import EnricherDGP
 
@@ -11,10 +11,11 @@ class SimpleDGP(BaseDataGenusProcessor):
 
     def init(self,
              steps=[
-                 LoaderDGP,
-                 PostLoaderDGP,
-                 TransformDGP,
-                 EnricherDGP,
+                PreLoaderDGP,
+                LoaderDGP,
+                PostLoaderDGP,
+                TransformDGP,
+                EnricherDGP,
              ]):
 
         self.steps = self.init_classes(steps)

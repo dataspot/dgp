@@ -74,3 +74,10 @@ class PostLoaderDGP(ConfigurableDGP):
     def init(self):
         super().init('loading', per_taxonomy=False)
         self._flows = None
+
+
+class PreLoaderDGP(ConfigurableDGP):
+
+    def init(self):
+        super().init('preloading', per_taxonomy=False)
+        self._flows = None
