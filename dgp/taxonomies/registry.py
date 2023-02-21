@@ -119,5 +119,5 @@ class TaxonomyRegistry():
                 args.append(arg)
 
             ret[id] = Taxonomy(id, *args)
-        ret.setdefault('_common_', Taxonomy('_common_', '_common_', {}, {}, {}, {}, {}, {}))
+        ret.setdefault('_common_', Taxonomy('_common_', '_common_', {}, {}, {}, {}, {}, {}, {}))
         return ret
