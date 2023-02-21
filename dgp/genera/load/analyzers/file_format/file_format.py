@@ -1,6 +1,7 @@
 from .....core import BaseAnalyzer, Validator, Required
 from .....config.consts import CONFIG_FORMAT, CONFIG_URL, CONFIG_DEDUPLICATE_HEADERS
 
+from .....config.log import logger
 
 class FileFormatAnalyzer(BaseAnalyzer):
 
@@ -9,7 +10,11 @@ class FileFormatAnalyzer(BaseAnalyzer):
     )
 
     def run(self):
-        stream = self.context.stream
+        try:
+            stream = self.context.stream
+        except Exception as e:
+            logger.error('FAILED to open stream', e)
+            stream = None
         if stream is not None:
             self.config[CONFIG_FORMAT] = stream.format
             self.config[CONFIG_DEDUPLICATE_HEADERS] = True
