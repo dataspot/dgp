@@ -13,7 +13,7 @@ class FileFormatAnalyzer(BaseAnalyzer):
         try:
             stream = self.context.stream
         except Exception as e:
-            logger.error('FAILED to open stream', e)
+            logger.error('FAILED to open stream: {}'.format(e))
             stream = None
         if stream is not None:
             self.config[CONFIG_FORMAT] = stream.format
