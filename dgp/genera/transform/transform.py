@@ -206,7 +206,7 @@ class TransformDGP(BaseDataGenusProcessor):
         return Flow(*steps)
 
     def flow(self):
-        if len(self.errors) == 0:
+        if len(self.errors) == 0 and self.config.get(CONFIG_PRIMARY_KEY) and self.config.get(CONFIG_MODEL_MAPPING):
             primaryKey = [self.ct_to_fn(f) for f in self.config.get(CONFIG_PRIMARY_KEY)]
 
             fieldOptions = {}
