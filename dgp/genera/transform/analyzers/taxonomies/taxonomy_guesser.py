@@ -16,8 +16,9 @@ class TaxonomyGuesserAnalyzer(BaseAnalyzer):
             fields = self.config[CONFIG_HEADER_FIELDS]
             c = Counter()
             taxonomies = self.context.taxonomies
-            if len(taxonomies) == 1:
-                self.config[CONFIG_TAXONOMY_ID] = taxonomies[0].id
+            taxonomy_ids = [x for x in taxonomies.all_ids() if x != '_common_']
+            if len(taxonomy_ids) == 1:
+                self.config[CONFIG_TAXONOMY_ID] = taxonomy_ids[0]
             else:
                 for field in fields:
                     taxonomy: Taxonomy

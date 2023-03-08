@@ -78,6 +78,9 @@ class TaxonomyRegistry():
 
     def all_ids(self):
         return sorted(self.index.keys())
+    
+    def count(self):
+        return len(self.index) - 1
 
     def __iter__(self):
         return iter(self.index.values())

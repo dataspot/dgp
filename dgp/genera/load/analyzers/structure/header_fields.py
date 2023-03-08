@@ -2,7 +2,7 @@ from dataflows import load
 
 from .....core import BaseAnalyzer, Validator, Required
 from .....config.consts import CONFIG_SKIP_ROWS, CONFIG_SKIP_COLS, CONFIG_HEADER_FIELDS
-
+from .....config.log import logger
 
 class HeaderFieldsAnalyzer(BaseAnalyzer):
 
