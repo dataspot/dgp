@@ -281,3 +281,5 @@ class TransformDGP(BaseDataGenusProcessor):
                 *steps
             )
             return f
+        else:
+            return Flow()
